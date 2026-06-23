@@ -6,6 +6,7 @@ All notable changes to LLM Fusion.
 
 ### Changed
 - Switched the Google provider surface from `gemini` CLI to `antigravity` CLI while keeping Gemini model names in the roster.
+- Pointed the Antigravity provider at the installed `agy` executable.
 
 ## [1.2.0] — 2026-06-16
 

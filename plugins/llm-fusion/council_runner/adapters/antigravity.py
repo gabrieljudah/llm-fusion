@@ -1,6 +1,6 @@
-"""antigravity adapter. Round-1 / judge / auditor are read-only
-(--approval-mode plan). Role injection keeps the Gemini CLI env var for
-transition compatibility. Stateless per process (never --resume). Executor
+"""antigravity adapter using the `agy` executable. Round-1 / judge / auditor
+are read-only through sandboxed print mode. Role text is prepended because agy's
+print mode has no separate system-prompt flag. Stateless per process. Executor
 (acting) deferred to v2 — antigravity has no proven OS-level fs sandbox flag in
 this runner, so the autonomous executor is codex-only."""
 from __future__ import annotations
@@ -9,7 +9,7 @@ import json
 import os
 from pathlib import Path
 
-from .base import Adapter
+from .base import Adapter, resolve_binary
 from ..core import AgentResult, Status
 
 # antigravity/gemini collapses several failures into exit 1; these subcodes are terminal.
@@ -19,28 +19,31 @@ _TERMINAL_EXIT = {42, 53}
 class AntigravityAdapter(Adapter):
     cli_name = "antigravity"
 
+    def __init__(self, spec, login_path: str | None = None):
+        self.spec = spec
+        self.login_path = login_path
+        self.binary = resolve_binary("agy", spec.path, login_path)
+
     async def invoke(
         self, prompt, *, model, workdir, timeout,
         role_text=None, role_path=None, execute=False, sandbox=None,
     ) -> AgentResult:
         if not self.installed():
-            return self._result(status=Status.NOT_INSTALLED, detail="antigravity not on PATH")
+            return self._result(status=Status.NOT_INSTALLED, detail="agy not on PATH")
         if execute:
             return self._result(
                 status=Status.ERROR,
                 detail="antigravity executor deferred to v2 (no OS fs sandbox); use codex executor",
             )
+        full_prompt = f"{role_text}\n\n{prompt}" if role_text else prompt
         argv = [
-            self.binary, "-p", prompt,
-            "--output-format", "json",
-            "-m", model,
-            "--approval-mode", "plan",
+            self.binary,
+            "--print", full_prompt,
+            "--model", model,
+            "--sandbox",
         ]
-        env = {}
-        if role_path:
-            env["GEMINI_SYSTEM_MD"] = str(Path(role_path).resolve())
 
-        rc, out, err, dur, timed = await self._run(argv, cwd=workdir, timeout=timeout, env=env)
+        rc, out, err, dur, timed = await self._run(argv, cwd=workdir, timeout=timeout)
         status, detail = self._classify(rc, out, err, timed)
 
         # parse JSON answer
@@ -76,4 +79,4 @@ class AntigravityAdapter(Adapter):
             return True, "antigravity oauth_creds.json present"
         if (Path.home() / ".gemini" / "oauth_creds.json").exists():
             return True, "gemini oauth_creds.json present"
-        return False, "no Antigravity auth found (run: antigravity, then /auth)"
+        return False, "no Antigravity auth found (run: agy, then /auth)"

@@ -14,7 +14,7 @@ This repo is both the **plugin** and its **marketplace** (the catalog Claude Cod
 **Prerequisites — you need all three CLIs installed and logged in, plus Python 3.11+:**
 - [`claude`](https://docs.claude.com/en/docs/claude-code) (Claude subscription)
 - `codex` (ChatGPT/Codex subscription)
-- `antigravity` (Google Antigravity / Gemini subscription)
+- `agy` (Google Antigravity CLI / Gemini subscription)
 
 Then, in Claude Code:
 
