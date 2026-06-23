@@ -38,7 +38,7 @@ class Status(str, Enum):
     def is_retryable(self) -> bool:
         # Never auto-retry a timeout (it already ate the whole budget) or a
         # terminal error. Retry rate limits and empty/malformed-stream responses
-        # (e.g. gemini INVALID_STREAM — usually transient, recovers on a retry).
+        # (e.g. antigravity/gemini INVALID_STREAM — usually transient).
         return self in (Status.RATE_LIMITED, Status.EMPTY)
 
 
@@ -331,9 +331,9 @@ _LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 # self-reference patterns stripped as a *backup* defense (the primary defense is
 # the round-1 "do not identify yourself" instruction). Every hit is logged.
 _SELF_REF_PATTERNS = [
-    r"\bas (an? )?(Claude|GPT|ChatGPT|OpenAI|Gemini|Google|Anthropic|Codex)\b[^.,;:\n]*",
-    r"\bI(?:'m| am) (Claude|GPT|ChatGPT|Gemini|Codex|an? \w+ model)\b",
-    r"\b(Claude|GPT-?\d?\.?\d?|Gemini|Codex)\b",
+    r"\bas (an? )?(Claude|GPT|ChatGPT|OpenAI|Gemini|Google|Anthropic|Codex|Antigravity)\b[^.,;:\n]*",
+    r"\bI(?:'m| am) (Claude|GPT|ChatGPT|Gemini|Codex|Antigravity|an? \w+ model)\b",
+    r"\b(Claude|GPT-?\d?\.?\d?|Gemini|Codex|Antigravity)\b",
     r"\bas the (architect|pragmatist|skeptic|operator|user[- ]advocate|first[- ]principles)\b",
 ]
 

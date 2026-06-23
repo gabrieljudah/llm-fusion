@@ -41,7 +41,7 @@ class CouncilError(Exception):
 # Environment
 # --------------------------------------------------------------------------- #
 def get_login_path() -> str:
-    """The login-shell PATH (codex/gemini may be absent from a bare PATH)."""
+    """The login-shell PATH (codex/antigravity may be absent from a bare PATH)."""
     try:
         r = subprocess.run(["bash", "-lc", 'printf %s "$PATH"'],
                            capture_output=True, text=True, timeout=10)
@@ -92,7 +92,7 @@ def load_roster(agents_yaml: Path) -> RosterConfig:
         defaults=data.get("defaults") or {},
         judge=data.get("judge") or {"backend": "handoff", "cli": "claude", "model": "opus"},
         executor=data.get("executor") or {"cli": "codex", "model": "gpt-5.5"},
-        auditor=data.get("auditor") or {"cli": "gemini", "model": "gemini-2.5-pro"},
+        auditor=data.get("auditor") or {"cli": "antigravity", "model": "gemini-3.1-pro-preview"},
         advise_agents=advise,
         execute_agents=execute,
     )

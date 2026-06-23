@@ -2,7 +2,7 @@
 
 > *Many models in. One fused answer out.*
 
-A **sealed multi-model LLM council** for Claude Code. One prompt → **Claude + Codex (GPT) + Gemini answer independently** (no peeking at each other) → anonymized → a judge fuses the best. Two commands:
+A **sealed multi-model LLM council** for Claude Code. One prompt → **Claude + Codex (GPT) + Antigravity (Gemini) answer independently** (no peeking at each other) → anonymized → a judge fuses the best. Two commands:
 
 - **`/fusion-council "<question>"`** — 6 different expert lenses across 3+ real models pressure-test a decision → you get a judged decision memo.
 - **`/fusion-build "<goal>"`** — a *build-off*: all 3 models plan the same task, the judge fuses the best plan, then it gets built and audited.
@@ -14,7 +14,7 @@ This repo is both the **plugin** and its **marketplace** (the catalog Claude Cod
 **Prerequisites — you need all three CLIs installed and logged in, plus Python 3.11+:**
 - [`claude`](https://docs.claude.com/en/docs/claude-code) (Claude subscription)
 - `codex` (ChatGPT/Codex subscription)
-- `gemini` (Google Gemini subscription)
+- `antigravity` (Google Antigravity / Gemini subscription)
 
 Then, in Claude Code:
 

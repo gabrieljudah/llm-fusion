@@ -1,5 +1,5 @@
 """codex adapter. The ONLY autonomous executor (codex has a real OS seatbelt;
-claude/gemini do not). Every call carries --ignore-user-config (R5 guard): on
+claude/antigravity do not). Every call carries --ignore-user-config (R5 guard): on
 codex's ~/.codex/config.toml commonly enables memories/use_memories + a supermemory
 MCP, which would carry a prior council answer forward. --ignore-user-config also
 drops model=gpt-5.5, so -m is always passed explicitly. exec has no

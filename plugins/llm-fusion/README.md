@@ -1,6 +1,6 @@
 # LLM Fusion — Sealed Multi-Model Council Runner
 
-One prompt → **claude + codex + gemini answer independently** (sealed, no cross-talk) → answers anonymized → a **Judge** synthesizes. Two modes:
+One prompt → **claude + codex + antigravity answer independently** (sealed, no cross-talk) → answers anonymized → a **Judge** synthesizes. Two modes:
 
 - **advise (council):** members give views → Judge → decision memo.
 - **execute (fusion):** members each *plan* → Judge synthesizes one execution spec → it gets built (by you, or by a sandboxed executor) → audited.
@@ -57,4 +57,4 @@ python3 -m unittest discover -s tests                       # fast, no CLI calls
 COUNCIL_LIVE_TESTS=1 python3 -m unittest tests.test_sandbox_escape   # live codex escape proof
 ```
 
-v2 (deferred): web dashboard, MCP tool, claude/gemini sandboxed executors.
+v2 (deferred): web dashboard, MCP tool, claude/antigravity sandboxed executors.

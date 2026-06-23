@@ -3,14 +3,14 @@ from __future__ import annotations
 
 from ..core import AgentSpec
 from .base import Adapter
+from .antigravity import AntigravityAdapter
 from .claude import ClaudeAdapter
 from .codex import CodexAdapter
-from .gemini import GeminiAdapter
 
 _REGISTRY: dict[str, type[Adapter]] = {
     "claude": ClaudeAdapter,
     "codex": CodexAdapter,
-    "gemini": GeminiAdapter,
+    "antigravity": AntigravityAdapter,
 }
 
 SUPPORTED_CLIS = tuple(_REGISTRY)

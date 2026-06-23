@@ -86,7 +86,7 @@ def _doctor(roster, project_root: Path, login_path: str, runs_dir: Path, ping: b
         mark = "✓" if ready else "✗"
         where = f" @ {adapter.binary}" if installed else ""
         roster_note = "" if in_roster else "  (not in roster)"
-        print(f"  {mark} {cli:<7} installed={installed}  authed={authed}{where}")
+        print(f"  {mark} {cli:<12} installed={installed}  authed={authed}{where}")
         print(f"        {detail}{roster_note}")
         if ping and ready and in_roster:
             res = asyncio.run(_ping_one(adapter, spec, runs_dir))

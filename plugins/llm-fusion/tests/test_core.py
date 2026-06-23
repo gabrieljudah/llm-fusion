@@ -55,7 +55,7 @@ class TestAnonymize(unittest.TestCase):
         results = [
             self._mk("claude-architect", "claude", "opus", "Claude here, I think X."),
             self._mk("codex-pragmatist", "codex", "gpt-5.5", "Ship the small thing."),
-            self._mk("gemini-skeptic", "gemini", "gemini-2.5-pro", "As Gemini, this fails."),
+            self._mk("antigravity-skeptic", "antigravity", "gemini-3.1-pro-preview", "As Gemini, this fails."),
         ]
         a1, m1 = anonymize(results, seed=42)
         a2, m2 = anonymize(results, seed=42)
@@ -63,13 +63,18 @@ class TestAnonymize(unittest.TestCase):
         self.assertEqual(set(a1), {"A", "B", "C"})
         # every original agent appears exactly once in the mapping
         mapped = {v["name"] for v in m1.values()}
-        self.assertEqual(mapped, {"claude-architect", "codex-pragmatist", "gemini-skeptic"})
+        self.assertEqual(mapped, {"claude-architect", "codex-pragmatist", "antigravity-skeptic"})
 
     def test_self_refs_stripped_from_answers(self):
-        results = [self._mk("gemini-skeptic", "gemini", "gemini-2.5-pro", "As Gemini, I doubt it.")]
+        results = [self._mk("antigravity-skeptic", "antigravity", "gemini-3.1-pro-preview", "As Gemini, I doubt it.")]
         answers, _ = anonymize(results, seed=1)
         text = answers["A"]
         self.assertNotIn("Gemini", text)
+
+    def test_antigravity_self_refs_stripped_from_answers(self):
+        cleaned, hits = strip_self_refs("As Antigravity, I would use Gemini.")
+        self.assertTrue(hits)
+        self.assertNotIn("Antigravity", cleaned)
 
     def test_strip_self_refs_reports_hits(self):
         cleaned, hits = strip_self_refs("As Claude, I am Claude and I run GPT-4.")

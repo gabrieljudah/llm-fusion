@@ -28,7 +28,7 @@ executor:
   cli: codex
   model: gpt-5.5
 auditor:
-  cli: gemini
+  cli: antigravity
   model: gemini-3.1-pro-preview
 
 # ---- ADVISE: the council of perspectives (6 lenses across 4 models) ----------
@@ -37,9 +37,9 @@ auditor:
 advise_agents:
   - { name: claude-architect,       cli: claude, model: opus,           role: roles/architect.md }
   - { name: codex-pragmatist,       cli: codex,  model: gpt-5.5,        role: roles/pragmatist.md }
-  - { name: gemini-skeptic,         cli: gemini, model: gemini-3.1-pro-preview, role: roles/skeptic.md }
+  - { name: antigravity-skeptic,    cli: antigravity, model: gemini-3.1-pro-preview, role: roles/skeptic.md }
   - { name: claude-firstprinciples, cli: claude, model: sonnet,         role: roles/first-principles.md }
-  - { name: gemini-operator,        cli: gemini, model: gemini-3.1-pro-preview, role: roles/operator.md }
+  - { name: antigravity-operator,   cli: antigravity, model: gemini-3.1-pro-preview, role: roles/operator.md }
   - { name: codex-useradvocate,     cli: codex,  model: gpt-5.5,        role: roles/user-advocate.md }
 
 # ---- EXECUTE: the build-off (SAME role, one per distinct model) --------------
@@ -49,4 +49,4 @@ advise_agents:
 execute_agents:
   - { name: claude-builder, cli: claude, model: opus,           role: roles/builder.md }
   - { name: codex-builder,  cli: codex,  model: gpt-5.5,        role: roles/builder.md }
-  - { name: gemini-builder, cli: gemini, model: gemini-3.1-pro-preview, role: roles/builder.md }
+  - { name: antigravity-builder, cli: antigravity, model: gemini-3.1-pro-preview, role: roles/builder.md }

@@ -1,6 +1,6 @@
 ---
 name: fusion-council
-description: Run a decision, question, or tradeoff through the LLM Fusion sealed multi-model council (claude + codex + gemini answer independently, anonymized), then synthesize the verdict AS the Judge. Use when the user says "fusion-council", "fusion council", "fusion this", "sealed council", "run the fusion council", or wants real different models (not in-Claude lenses) to pressure-test a decision and hand it back for a judged verdict. For the lighter in-Claude lenses tool use /council instead; to BUILD something use /fusion-build.
+description: Run a decision, question, or tradeoff through the LLM Fusion sealed multi-model council (claude + codex + antigravity answer independently, anonymized), then synthesize the verdict AS the Judge. Use when the user says "fusion-council", "fusion council", "fusion this", "sealed council", "run the fusion council", or wants real different models (not in-Claude lenses) to pressure-test a decision and hand it back for a judged verdict. For the lighter in-Claude lenses tool use /council instead; to BUILD something use /fusion-build.
 ---
 
 # fusion-council — sealed multi-model council (advise mode)
@@ -29,4 +29,4 @@ The default advise council is **6 lenses across 4 models** (architect, pragmatis
 - **Don't answer from your own reasoning first.** The whole point is the sealed council; run it, then judge what it produced.
 - A failed agent (not-authenticated / rate-limited / timeout) is handled gracefully — the council proceeds on quorum (≥2 answers from ≥2 providers). If it aborts below quorum, relay the actionable error.
 - For a **fully unattended / headless** run (no main-session judging), use `--judge auto` instead — the runner spawns a fresh judge CLI and writes `final_report.md` itself.
-- Doctor check before a run if unsure: `cd "$PLUGIN" && python3 -m council_runner --doctor` (verifies the member has claude + codex + gemini installed + authenticated).
+- Doctor check before a run if unsure: `cd "$PLUGIN" && python3 -m council_runner --doctor` (verifies the member has claude + codex + antigravity installed + authenticated).

@@ -8,6 +8,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from council_runner.adapters import SUPPORTED_CLIS, get_adapter  # noqa: E402
+from council_runner.core import AgentSpec  # noqa: E402
 from council_runner.orchestrator import CouncilError, load_prompts, load_roster  # noqa: E402
 
 
@@ -16,11 +18,22 @@ class TestRoster(unittest.TestCase):
         roster = load_roster(ROOT / "agents.yaml")
         self.assertEqual(len(roster.advise_agents), 6)        # 6 diverse lenses
         self.assertEqual(len(roster.execute_agents), 3)       # one builder per model
-        self.assertEqual({a.cli for a in roster.execute_agents}, {"claude", "codex", "gemini"})
+        self.assertEqual({a.cli for a in roster.execute_agents}, {"claude", "codex", "antigravity"})
         # execute agents all wear the SAME role (the build-off invariant)
         self.assertEqual({a.role for a in roster.execute_agents}, {"roles/builder.md"})
         self.assertEqual(roster.quorum, 2)
         self.assertEqual(roster.judge["backend"], "handoff")
+
+    def test_antigravity_cli_is_supported_provider(self):
+        self.assertIn("antigravity", SUPPORTED_CLIS)
+        spec = AgentSpec(
+            name="antigravity-skeptic",
+            cli="antigravity",
+            model="gemini-3.1-pro-preview",
+            role="roles/skeptic.md",
+        )
+        adapter = get_adapter(spec)
+        self.assertEqual(adapter.cli_name, "antigravity")
 
     def _write(self, body: str) -> Path:
         d = Path(tempfile.mkdtemp())
@@ -34,7 +47,7 @@ class TestRoster(unittest.TestCase):
         y = self._write(
             "advise_agents:\n"
             "  - { name: x, cli: claude, model: opus, role: roles/a.md }\n"
-            "  - { name: y, cli: gemini, model: opus, role: roles/b.md }\n"
+            "  - { name: y, cli: antigravity, model: opus, role: roles/b.md }\n"
         )
         with self.assertRaises(CouncilError) as ctx:
             load_roster(y)
@@ -56,7 +69,7 @@ class TestRoster(unittest.TestCase):
             "advise_agents:\n"
             "  - { name: x, cli: claude, model: opus, role: roles/missing.md }\n"
             "  - { name: y, cli: codex, model: gpt-5.5, role: roles/missing.md }\n"
-            "  - { name: z, cli: gemini, model: pro, role: roles/missing.md }\n"
+            "  - { name: z, cli: antigravity, model: pro, role: roles/missing.md }\n"
         )
         with self.assertRaises(CouncilError):
             load_roster(d / "agents.yaml")
@@ -66,11 +79,11 @@ class TestRoster(unittest.TestCase):
             "advise_agents:\n"
             "  - { name: x, cli: claude, model: opus, role: roles/a.md }\n"
             "  - { name: y, cli: codex, model: gpt-5.5, role: roles/b.md }\n"
-            "  - { name: z, cli: gemini, model: pro, role: roles/c.md }\n"
+            "  - { name: z, cli: antigravity, model: pro, role: roles/c.md }\n"
             "execute_agents:\n"
             "  - { name: e1, cli: claude, model: opus, role: roles/builder.md }\n"
-            "  - { name: e2, cli: gemini, model: pro, role: roles/builder.md }\n"
-            "  - { name: e3, cli: gemini, model: pro, role: roles/builder.md }\n"
+            "  - { name: e2, cli: antigravity, model: pro, role: roles/builder.md }\n"
+            "  - { name: e3, cli: antigravity, model: pro, role: roles/builder.md }\n"
         )
         with self.assertRaises(CouncilError) as ctx:
             load_roster(y)
@@ -82,7 +95,7 @@ class TestRoster(unittest.TestCase):
             "advise_agents:\n"
             "  - { name: x, cli: claude, model: opus, role: roles/a.md }\n"
             "  - { name: y, cli: codex, model: gpt-5.5, role: roles/b.md }\n"
-            "  - { name: z, cli: gemini, model: pro, role: roles/c.md }\n"
+            "  - { name: z, cli: antigravity, model: pro, role: roles/c.md }\n"
         )
         roster = load_roster(y)
         self.assertEqual(len(roster.execute_agents), 3)

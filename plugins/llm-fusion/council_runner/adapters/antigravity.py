@@ -1,7 +1,8 @@
-"""gemini adapter. Round-1 / judge / auditor are read-only (--approval-mode
-plan). Role injected via GEMINI_SYSTEM_MD (a file path). Stateless per process
-(never --resume). Executor (acting) deferred to v2 — gemini has no OS-level fs
-sandbox flag, so the autonomous executor is codex-only."""
+"""antigravity adapter. Round-1 / judge / auditor are read-only
+(--approval-mode plan). Role injection keeps the Gemini CLI env var for
+transition compatibility. Stateless per process (never --resume). Executor
+(acting) deferred to v2 — antigravity has no proven OS-level fs sandbox flag in
+this runner, so the autonomous executor is codex-only."""
 from __future__ import annotations
 
 import json
@@ -11,23 +12,23 @@ from pathlib import Path
 from .base import Adapter
 from ..core import AgentResult, Status
 
-# gemini collapses several failures into exit 1; these subcodes are terminal.
+# antigravity/gemini collapses several failures into exit 1; these subcodes are terminal.
 _TERMINAL_EXIT = {42, 53}
 
 
-class GeminiAdapter(Adapter):
-    cli_name = "gemini"
+class AntigravityAdapter(Adapter):
+    cli_name = "antigravity"
 
     async def invoke(
         self, prompt, *, model, workdir, timeout,
         role_text=None, role_path=None, execute=False, sandbox=None,
     ) -> AgentResult:
         if not self.installed():
-            return self._result(status=Status.NOT_INSTALLED, detail="gemini not on PATH")
+            return self._result(status=Status.NOT_INSTALLED, detail="antigravity not on PATH")
         if execute:
             return self._result(
                 status=Status.ERROR,
-                detail="gemini executor deferred to v2 (no OS fs sandbox); use codex executor",
+                detail="antigravity executor deferred to v2 (no OS fs sandbox); use codex executor",
             )
         argv = [
             self.binary, "-p", prompt,
@@ -55,7 +56,7 @@ class GeminiAdapter(Adapter):
                     answer = out.strip()  # text fell through despite --output-format json
 
         if status == Status.OK and not answer:
-            detail = "gemini: empty response"
+            detail = "antigravity: empty response"
             if isinstance(gerror, dict):
                 detail += f" ({gerror.get('type')}: {str(gerror.get('message', ''))[:120]})"
             # empty/INVALID_STREAM is a transient model hiccup -> retryable
@@ -67,8 +68,12 @@ class GeminiAdapter(Adapter):
     def auth_check(self) -> tuple[bool, str]:
         if not self.installed():
             return False, "not installed"
+        if os.environ.get("ANTIGRAVITY_API_KEY"):
+            return True, "ANTIGRAVITY_API_KEY set"
         if os.environ.get("GEMINI_API_KEY"):
             return True, "GEMINI_API_KEY set"
+        if (Path.home() / ".antigravity" / "oauth_creds.json").exists():
+            return True, "antigravity oauth_creds.json present"
         if (Path.home() / ".gemini" / "oauth_creds.json").exists():
-            return True, "oauth_creds.json present"
-        return False, "no GEMINI_API_KEY / oauth_creds.json (run: gemini, then /auth)"
+            return True, "gemini oauth_creds.json present"
+        return False, "no Antigravity auth found (run: antigravity, then /auth)"
