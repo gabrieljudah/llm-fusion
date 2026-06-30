@@ -4,7 +4,14 @@ All notable changes to LLM Fusion.
 
 ## Unreleased
 
+### Added
+- **Grok (xAI) as a 4th provider.** New `GrokAdapter` (`council_runner/adapters/grok.py`) drives the xAI Grok Build CLI (`grok`) in headless read-only mode (`-p … --output-format json --permission-mode plan`), with a defensive extractor that tolerates json / streaming-json / plain-text output. Registered in the adapter registry; `roles/realist.md` adds the *realist* lens (live market/world reality, timing, data-grounded risk). Roster: `grok-realist` joins `advise_agents` (now 7 lenses across 5 models) and `grok-builder` joins `execute_agents` (4 models). Grok advises and plans only — it never executes; the autonomous executor stays codex-only. Verified live against `grok` 0.2.77 (`--doctor --ping`).
+- **`GeminiAdapter` — a latent gemini-cli fallback for the Google seat** (`council_runner/adapters/gemini.py`). Registered but **not** wired into `agents.yaml` (antigravity/`agy` stays the active Google seat); a drop-in for environments where Antigravity isn't installed or the Gemini tier doesn't grant Antigravity quota — activate by swapping `cli: antigravity` → `cli: gemini` in the roster.
+- Seal hardened — anonymization patterns and the round-1 prompts now strip Grok/xAI self-references too.
+- Test coverage for both new providers (argv construction, executor-guard refusal, self-reference stripping) + updated roster-count assertions.
+
 ### Changed
+- Sonnet seat (`claude-firstprinciples`) pinned to **`claude-sonnet-5`** (released 2026-06-30, narrows the gap with Opus 4.8). If you'd rather the `sonnet` alias auto-track future releases, that's a one-line revert.
 - Switched the Google provider surface from `gemini` CLI to `antigravity` CLI while keeping Gemini model names in the roster.
 - Pointed the Antigravity provider at the installed `agy` executable.
 
