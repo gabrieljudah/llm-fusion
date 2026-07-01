@@ -9,7 +9,7 @@
 # Subset YAML only (maps + lists of inline {flow} mappings).
 
 defaults:
-  round1_timeout_sec: 300
+  round1_timeout_sec: 480
   judge_timeout_sec: 360
   executor_timeout_sec: 900
   retries: 1
@@ -31,18 +31,18 @@ auditor:
   cli: antigravity
   model: gemini-3.1-pro-preview
 
-# ---- ADVISE: the council of perspectives (7 lenses across 5 models) ----------
+# ---- ADVISE: the council of perspectives (7 lenses across 4 models) ----------
 # Each model wears a DIFFERENT lens. Any lens can ride any model — this pairing
 # is editable; the only hard rule is >=3 distinct models. Providers: claude,
-# codex, antigravity, grok (4 vendors; claude runs as opus + sonnet -> 5 models).
+# codex, antigravity, grok (4 vendors, each at its highest-reasoning tier).
 advise_agents:
   - { name: claude-architect,       cli: claude, model: opus,           role: roles/architect.md }
   - { name: codex-pragmatist,       cli: codex,  model: gpt-5.5,        role: roles/pragmatist.md }
   - { name: antigravity-skeptic,    cli: antigravity, model: gemini-3.1-pro-preview, role: roles/skeptic.md }
-  - { name: claude-firstprinciples, cli: claude, model: claude-sonnet-5, role: roles/first-principles.md }
+  - { name: claude-firstprinciples, cli: claude, model: opus, role: roles/first-principles.md }
   - { name: antigravity-operator,   cli: antigravity, model: gemini-3.1-pro-preview, role: roles/operator.md }
   - { name: codex-useradvocate,     cli: codex,  model: gpt-5.5,        role: roles/user-advocate.md }
-  - { name: grok-realist,           cli: grok,   model: grok-composer-2.5-fast, role: roles/realist.md }
+  - { name: grok-realist,           cli: grok,   model: grok-build, role: roles/realist.md }
 
 # ---- EXECUTE: the build-off (SAME role, one per distinct model) --------------
 # Identical builder role; the diversity IS the model. Judge fuses the best of
