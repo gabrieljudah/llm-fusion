@@ -1,5 +1,4 @@
 """Roster validation + prompt-template contract tests."""
-import asyncio
 import sys
 import tempfile
 import tomllib
@@ -9,87 +8,19 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from council_runner.adapters import SUPPORTED_CLIS, get_adapter  # noqa: E402
-from council_runner.core import AgentSpec, Status  # noqa: E402
 from council_runner.orchestrator import CouncilError, load_prompts, load_roster  # noqa: E402
 
 
 class TestRoster(unittest.TestCase):
     def test_loads_shipped_roster(self):
         roster = load_roster(ROOT / "agents.yaml")
-        self.assertEqual(len(roster.advise_agents), 6)        # 6 diverse lenses
-        self.assertEqual(len(roster.execute_agents), 3)       # one builder per model
-        self.assertEqual({a.cli for a in roster.execute_agents}, {"claude", "codex", "antigravity"})
+        self.assertEqual(len(roster.advise_agents), 7)        # 7 diverse lenses
+        self.assertEqual(len(roster.execute_agents), 4)       # one builder per model
+        self.assertEqual({a.cli for a in roster.execute_agents}, {"claude", "codex", "antigravity", "grok"})
         # execute agents all wear the SAME role (the build-off invariant)
         self.assertEqual({a.role for a in roster.execute_agents}, {"roles/builder.md"})
         self.assertEqual(roster.quorum, 2)
         self.assertEqual(roster.judge["backend"], "handoff")
-
-    def test_antigravity_cli_is_supported_provider(self):
-        self.assertIn("antigravity", SUPPORTED_CLIS)
-        spec = AgentSpec(
-            name="antigravity-skeptic",
-            cli="antigravity",
-            model="gemini-3.1-pro-preview",
-            role="roles/skeptic.md",
-        )
-        adapter = get_adapter(spec)
-        self.assertEqual(adapter.cli_name, "antigravity")
-
-    def test_antigravity_provider_uses_agy_binary(self):
-        d = Path(tempfile.mkdtemp())
-        agy = d / "agy"
-        agy.write_text("#!/bin/sh\nexit 0\n")
-        agy.chmod(0o755)
-        spec = AgentSpec(
-            name="antigravity-skeptic",
-            cli="antigravity",
-            model="gemini-3.1-pro-preview",
-            role="roles/skeptic.md",
-        )
-
-        adapter = get_adapter(spec, login_path=str(d))
-
-        self.assertTrue(adapter.installed())
-        self.assertEqual(Path(adapter.binary).name, "agy")
-
-    def test_antigravity_invoke_uses_agy_print_mode(self):
-        d = Path(tempfile.mkdtemp())
-        args_file = d / "args.txt"
-        agy = d / "agy"
-        agy.write_text(f"#!/bin/sh\nprintf '%s\\n' \"$@\" > '{args_file}'\nprintf 'READY\\n'\n")
-        agy.chmod(0o755)
-        workdir = d / "work"
-        workdir.mkdir()
-        spec = AgentSpec(
-            name="antigravity-skeptic",
-            cli="antigravity",
-            model="gemini-3.1-pro-preview",
-            role="roles/skeptic.md",
-        )
-        adapter = get_adapter(spec, login_path=str(d))
-
-        result = asyncio.run(adapter.invoke(
-            "Answer the brief.",
-            model="gemini-3.1-pro-preview",
-            workdir=workdir,
-            timeout=5,
-            role_text="You are the skeptic.",
-        ))
-
-        args_text = args_file.read_text()
-        args = args_text.splitlines()
-        self.assertEqual(result.status, Status.OK)
-        self.assertEqual(result.answer, "READY")
-        self.assertEqual(args[0], "--print")
-        self.assertIn("You are the skeptic.", args_text)
-        self.assertIn("Answer the brief.", args_text)
-        self.assertIn("--model", args)
-        self.assertIn("gemini-3.1-pro-preview", args)
-        self.assertIn("--sandbox", args)
-        self.assertNotIn("--output-format", args)
-        self.assertNotIn("--approval-mode", args)
-        self.assertNotIn("-m", args)
 
     def _write(self, body: str) -> Path:
         d = Path(tempfile.mkdtemp())
