@@ -1,6 +1,6 @@
 # LLM Fusion — Sealed Multi-Model Council Runner
 
-One prompt → **claude + codex + antigravity answer independently** (sealed, no cross-talk) → answers anonymized → a **Judge** synthesizes. Two modes:
+One prompt → **claude + codex + antigravity + grok answer independently** (sealed, no cross-talk) → answers anonymized → a **Judge** synthesizes. Two modes:
 
 - **advise (council):** members give views → Judge → decision memo.
 - **execute (fusion):** members each *plan* → Judge synthesizes one execution spec → it gets built (by you, or by a sandboxed executor) → audited.
@@ -12,7 +12,7 @@ The core value is the **seal**: in Round 1 no model sees another's answer and no
 ```bash
 cd /path/to/llm-fusion/plugins/llm-fusion
 # zero runtime deps; Python 3.11+. (PyYAML optional — a bundled subset loader reads agents.yaml without it.)
-python3 -m council_runner --doctor          # check all three CLIs are installed + authed
+python3 -m council_runner --doctor          # check all four CLIs are installed + authed
 ```
 
 ## Use
@@ -38,13 +38,13 @@ From **Claude Code**, just use the skills: `/fusion-council "<question>"` and `/
 |---|---|
 | One model herds toward another's answer | Each Round-1 agent is a separate process in its own `private/<agent>/` dir; no agent ever sees a sibling's answer. |
 | Prior run carries forward | No session resume; **codex always runs `--ignore-user-config`** (its memory/supermemory would otherwise carry answers). |
-| Judge biased by knowing who said what | Answers shuffled to A/B/C; `mapping.json` kept at run root (never in `public/answers/`); self-references stripped. |
+| Judge biased by knowing who said what | Answers shuffled to anonymous letters; `mapping.json` kept at run root (never in `public/answers/`); self-references stripped. |
 | Below 3 models = weak council | Preflight requires ≥3 distinct models; a runtime DIVERSITY WARNING fires if fewer survive. |
 | Execute mode damages real files | Build runs in a copied, `git init`'d sandbox; the codex executor's writable roots are pinned, `/tmp`/`$TMPDIR` excluded, network off. **Proven by `tests/test_sandbox_escape.py`.** |
 
 ## Config — `agents.yaml`
 
-3 agents, one per model (add more = one line + a `roles/*.md`). Per-agent `name/cli/model/role` (+ optional `path`). `defaults` (timeouts/retries/quorum), `judge` (handoff|auto + cli/model), `executor` (codex), `auditor` (different model).
+The shipped roster has 7 advise agents and 4 execute planners across claude, codex, antigravity, and grok. Per-agent `name/cli/model/role` (+ optional `path`). `defaults` (timeouts/retries/quorum), `judge` (handoff|auto + cli/model), `executor` (codex), `auditor` (different model).
 
 ## Layout
 
@@ -54,7 +54,7 @@ From **Claude Code**, just use the skills: `/fusion-council "<question>"` and `/
 
 ```bash
 python3 -m unittest discover -s tests                       # fast, no CLI calls
-COUNCIL_LIVE_TESTS=1 python3 -m unittest tests.test_sandbox_escape   # live codex escape proof
+COUNCIL_LIVE_TESTS=1 python3 -m unittest discover -s tests -p 'test_sandbox_escape.py'   # live codex escape proof
 ```
 
 v2 (deferred): web dashboard, MCP tool, claude/antigravity sandboxed executors.

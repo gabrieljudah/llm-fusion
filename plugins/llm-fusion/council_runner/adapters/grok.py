@@ -8,10 +8,10 @@ is the realist lens: live market/world reality, timing, and data-grounded risk.
 
 Flags confirmed against `grok --help` (Grok Build TUI, 2026-06-30): `-p/--single`
 (headless single-turn → stdout), `--model`, `--output-format {plain,json,
-streaming-json}`, and `--permission-mode {default,plan,…}` where `plan` is the
-read-only mode (reads/searches but never edits or executes — keeps grok's live
-web-search edge, its realist differentiator, while blocking writes). The JSON
-parse falls back to raw stdout, so a stray output shape degrades, not corrupts."""
+streaming-json}`, and `--permission-mode {default,plan,…}`. The runner also
+passes `--no-memory`, `--no-subagents`, `--verbatim`, and `--tools ""` to reduce
+hidden context and tool surface during sealed runs. The JSON parse falls back to
+raw stdout, so a stray output shape degrades, not corrupts."""
 from __future__ import annotations
 
 import json
@@ -47,6 +47,10 @@ class GrokAdapter(Adapter):
             "--model", model,
             "--output-format", self.OUTPUT_FORMAT,
             "--permission-mode", self.PERMISSION_MODE,
+            "--no-memory",
+            "--no-subagents",
+            "--verbatim",
+            "--tools", "",
         ]
 
         rc, out, err, dur, timed = await self._run(argv, cwd=workdir, timeout=timeout)

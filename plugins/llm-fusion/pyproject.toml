@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "llm-fusion"
 version = "1.2.0"
-description = "Sealed multi-model LLM council runner (claude/codex/antigravity), advise + execute."
+description = "Sealed multi-model LLM council runner (claude/codex/antigravity/grok), advise + execute."
 requires-python = ">=3.11"
 dependencies = []                 # zero runtime deps; PyYAML used only if present
 

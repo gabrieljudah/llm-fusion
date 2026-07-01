@@ -39,7 +39,13 @@ class GeminiAdapter(Adapter):
         full_prompt = f"{role_text}\n\n{prompt}" if role_text else prompt
         # -p = headless; -m = model; YOLO stays OFF (default) so it won't auto-run
         # tool/file actions. gemini-cli print mode emits plain text (no JSON flag).
-        argv = [self.binary, "-p", full_prompt, "--model", model]
+        argv = [
+            self.binary,
+            "-p", full_prompt,
+            "--model", model,
+            "--approval-mode", "plan",
+            "--sandbox",
+        ]
 
         rc, out, err, dur, timed = await self._run(argv, cwd=workdir, timeout=timeout)
         status, detail = self._classify(rc, out, err, timed)
