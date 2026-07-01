@@ -45,6 +45,7 @@ class GrokAdapter(Adapter):
             self.binary,
             "-p", full_prompt,
             "--model", model,
+            "--reasoning-effort", "high",   # council: max reasoning tier
             "--output-format", self.OUTPUT_FORMAT,
             "--permission-mode", self.PERMISSION_MODE,
             "--no-memory",

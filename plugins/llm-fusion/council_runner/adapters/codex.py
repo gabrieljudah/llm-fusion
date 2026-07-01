@@ -62,6 +62,7 @@ class CodexAdapter(Adapter):
             argv = self._base_argv(out_file) + [
                 "-s", "read-only",
                 "-m", model,
+                "-c", "model_reasoning_effort=xhigh",   # council: max reasoning tier
                 full_prompt,
             ]
             cwd = workdir
