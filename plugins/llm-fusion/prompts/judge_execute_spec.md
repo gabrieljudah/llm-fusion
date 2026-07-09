@@ -3,6 +3,8 @@ You are **The Judge** of a sealed multi-model AI council. You did **not** partic
 ## The original goal
 {{BRIEF}}
 
+{{CONTEXT}}
+
 ## The council's plans
 {{ANSWERS}}
 

@@ -252,6 +252,71 @@ def render(template: str, **vars: str) -> str:
 
 
 # --------------------------------------------------------------------------- #
+# Context / evidence bundling (MoA-style: give members real task state, not
+# just the brief). Optional, off by default (empty --context list -> "").
+# --------------------------------------------------------------------------- #
+_CONTEXT_PER_FILE_BUDGET = 8000
+_CONTEXT_TOTAL_BUDGET = 24000
+
+
+def truncate_head_tail(text: str, budget: int) -> str:
+    """Head+tail preview with an omission marker (MoA-style)."""
+    if not text or len(text) <= budget:
+        return text
+    half = budget // 2
+    omitted = len(text) - 2 * half
+    return f"{text[:half]}\n[... {omitted} chars omitted ...]\n{text[-half:]}"
+
+
+def build_context_block(paths: list[Path], per_file_budget: int = _CONTEXT_PER_FILE_BUDGET,
+                        total_budget: int = _CONTEXT_TOTAL_BUDGET) -> str:
+    """Render a '## Context / evidence' block from a list of file paths, in
+    argument order. Each file is head+tail truncated to per_file_budget chars.
+    Once the accumulated block would exceed total_budget, remaining files are
+    skipped (not read) and named in a trailing marker. Unreadable/missing
+    paths are skipped and named in a separate trailing marker. Empty list ->
+    "" (no block, no header)."""
+    if not paths:
+        return ""
+    sections: list[str] = []
+    unreadable: list[str] = []
+    omitted_for_size: list[str] = []
+    total = 0
+    over_budget = False
+    for p in paths:
+        path = Path(p)
+        if over_budget:
+            omitted_for_size.append(path.name)
+            continue
+        try:
+            text = path.read_text(encoding="utf-8", errors="replace")
+        except Exception:
+            unreadable.append(path.name)
+            continue
+        body = truncate_head_tail(text, per_file_budget)
+        section = f"### file: {path.name}\n{body}"
+        if total + len(section) > total_budget:
+            over_budget = True
+            omitted_for_size.append(path.name)
+            continue
+        sections.append(section)
+        total += len(section)
+
+    header = (
+        "## Context / evidence\n"
+        "The orchestrating session gathered the following real state/evidence for "
+        "this brief. Treat it as ground truth about the current situation; ground "
+        "your analysis in it and do not invent facts beyond it."
+    )
+    parts = [header, *sections]
+    if unreadable:
+        parts.append(f"[unreadable context files skipped: {', '.join(unreadable)}]")
+    if omitted_for_size:
+        parts.append(f"[additional context files omitted for size: {', '.join(omitted_for_size)}]")
+    return "\n\n".join(parts)
+
+
+# --------------------------------------------------------------------------- #
 # Run folder
 # --------------------------------------------------------------------------- #
 _SLUG_RE = re.compile(r"[^a-z0-9]+")

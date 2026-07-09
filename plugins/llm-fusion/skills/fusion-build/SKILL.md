@@ -15,7 +15,7 @@ This is a **build-off**: the 4 planning models (claude/codex/antigravity/grok) e
    PLUGIN="${PLUGIN:-$HOME/projects/llm-fusion/plugins/llm-fusion}"
    cd "$PLUGIN" && python3 -m council_runner --mode execute --judge handoff --brief "<the build goal>" [--workspace <abs path to the repo/dir to build in>]
    ```
-   Each planning model produces a PLAN for the same goal (same builder role), sealed and anonymized. The runner exits `awaiting-judge` with the run path. Pass `--workspace` when the work targets an existing project; omit it for greenfield.
+   Each planning model produces a PLAN for the same goal (same builder role), sealed and anonymized. The runner exits `awaiting-judge` with the run path. Pass `--workspace` when the work targets an existing project; omit it for greenfield. `--context <path>` (repeatable) also works here — pass small evidence/spec files so every planning model plans against real state instead of assumptions.
 
 2. **Read ONLY the anonymized plans.** Read `<run>/JUDGE_INSTRUCTIONS.md` and `<run>/public/answers/*.md`. **Do NOT open `mapping.json`.**
 

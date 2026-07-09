@@ -15,6 +15,11 @@ All notable changes to LLM Fusion.
 - Switched the Google provider surface from `gemini` CLI to `antigravity` CLI while keeping Gemini model names in the roster.
 - Pointed the Antigravity provider at the installed `agy` executable.
 
+## [1.3.0] — 2026-07-09
+
+### Added
+- **`--context <path>` evidence bundling for the council runner** (repeatable). Council members and the judge can now receive real task state — head+tail truncated file contents (`council_runner.core.build_context_block` / `truncate_head_tail`, 8k chars/file, 24k total) — instead of only the brief text, closing the gap with Hermes MoA's state-aware reference models. Missing/unreadable paths are skipped with a warning; oversized bundles are cut off with an `[additional context files omitted for size: …]` marker rather than silently truncating mid-file. Wired into `run_advise`/`run_execute` (`flows.py`), the round1 templates (`{{CONTEXT}}` in `round1_advise.md`/`round1_execute.md`) and the judge templates (`judge_advise.md`/`judge_execute_spec.md`); an empty `--context` list leaves prompts byte-identical to before. `skills/fusion-council` and `skills/fusion-build` document writing a small evidence bundle to the scratchpad and passing it with `--context`. New `tests/test_context_bundle.py`.
+
 ## [1.2.0] — 2026-06-16
 
 ### Added

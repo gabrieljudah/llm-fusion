@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 from .adapters import SUPPORTED_CLIS, get_adapter
-from .core import AgentSpec, Status
+from .core import AgentSpec, Status, build_context_block
 from .flows import run_advise, run_execute
 from .orchestrator import (
     CouncilError,
@@ -62,6 +62,8 @@ def build_parser() -> argparse.ArgumentParser:
                    help="execute mode: dir copied into the sandbox as the executor's writable root")
     p.add_argument("--agents", default=str(PKG_ROOT / "agents.yaml"),
                    help="path to agents.yaml")
+    p.add_argument("--context", action="append", default=[], metavar="PATH",
+                   help="evidence file for council members (repeatable); head+tail truncated")
     p.add_argument("--runs-dir", default=str(data_dir() / "council-runs"),
                    help="where run folders are created (persistent, outside the plugin dir)")
     p.add_argument("--doctor", action="store_true", help="report per-CLI readiness and exit")
@@ -149,13 +151,25 @@ def main(argv: list[str] | None = None) -> int:
     workspace = Path(args.workspace).expanduser().resolve() if args.workspace else None
     runs_dir.mkdir(parents=True, exist_ok=True)
 
+    context_paths: list[Path] = []
+    for raw_path in args.context:
+        cp = Path(raw_path).expanduser()
+        if not cp.is_file():
+            print(f"warning: --context path not found, skipping: {cp}", file=sys.stderr)
+            continue
+        context_paths.append(cp)
+    context_block = build_context_block(context_paths)
+    context_files = [cp.name for cp in context_paths]
+
     try:
         if args.mode == "advise":
             paths = asyncio.run(run_advise(roster, project_root, login_path, prompts,
-                                           args.brief, runs_dir, backend))
+                                           args.brief, runs_dir, backend,
+                                           context=context_block, context_files=context_files))
         else:
             paths = asyncio.run(run_execute(roster, project_root, login_path, prompts,
-                                            args.brief, runs_dir, backend, workspace))
+                                            args.brief, runs_dir, backend, workspace,
+                                            context=context_block, context_files=context_files))
     except CouncilError as e:
         print(f"\ncouncil aborted: {e}", file=sys.stderr)
         return 1

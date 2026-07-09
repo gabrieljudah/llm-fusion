@@ -9,11 +9,12 @@ You orchestrate a **sealed council** of real, different models, then you are the
 
 ## Steps
 
-1. **Run the council** (advise mode, you judge). Locate the bundled runner (works installed or from a dev checkout), then run it:
+1. **Run the council** (advise mode, you judge). For any question involving concrete state (code, configs, metrics, errors, prior decisions), FIRST write an evidence bundle — one or more small markdown/text files with the relevant excerpts and facts (not whole repos) — to the scratchpad, then pass each with `--context <path>` (repeatable). Locate the bundled runner (works installed or from a dev checkout), then run it:
    ```bash
    PLUGIN="${CLAUDE_PLUGIN_ROOT:-$(ls -d "$HOME"/.claude/plugins/cache/*/llm-fusion/*/ 2>/dev/null | sort -V | tail -1)}"
    PLUGIN="${PLUGIN:-$HOME/projects/llm-fusion/plugins/llm-fusion}"
-   cd "$PLUGIN" && python3 -m council_runner --mode advise --judge handoff --brief "<the user's question, verbatim or lightly cleaned>"
+   cd "$PLUGIN" && python3 -m council_runner --mode advise --judge handoff --brief "<the user's question, verbatim or lightly cleaned>" \
+     # --context <path/to/evidence.md> [--context <path/to/more-evidence.md> ...]  # optional, repeatable
    ```
    It fans out to the roster in `agents.yaml`, runs sealed Round 1 in parallel, anonymizes, and exits `awaiting-judge`, printing the run path (under `~/.llm-council/council-runs/`).
 
