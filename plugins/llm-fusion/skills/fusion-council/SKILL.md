@@ -9,21 +9,26 @@ You orchestrate a **sealed council** of real, different models, then you are the
 
 ## Steps
 
-1. **Run the council** (advise mode, you judge). Locate the bundled runner (works installed or from a dev checkout), then run it:
+1. **Let the user choose the models.** Ask one multi-select question with these exact options: **Claude — Fable 5**, **Claude — Opus 4.8**, **Codex — GPT5.6 sol**, **Gemini — 3.1**, **Grok — 4.6**. Require at least 3 choices across at least 2 providers. If the user says “all” or does not want to choose, use all five.
+
+2. **Run the council** (advise mode, you judge). Locate the bundled runner, then run it with one `--model` flag per choice:
    ```bash
    PLUGIN="${CLAUDE_PLUGIN_ROOT:-$(ls -d "$HOME"/.claude/plugins/cache/*/llm-fusion/*/ 2>/dev/null | sort -V | tail -1)}"
    PLUGIN="${PLUGIN:-$HOME/projects/llm-fusion/plugins/llm-fusion}"
-   cd "$PLUGIN" && python3 -m council_runner --mode advise --judge handoff --brief "<the user's question, verbatim or lightly cleaned>"
+   cd "$PLUGIN" && python3 -m council_runner --mode advise --judge handoff \
+     --model "<fable-5|opus-4.8|gpt-5.6-sol|gemini-3.1|grok-4.6>" \
+     --model "<second choice>" --model "<third choice>" \
+     --brief "<the user's question, verbatim or lightly cleaned>"
    ```
    It fans out to the roster in `agents.yaml`, runs sealed Round 1 in parallel, anonymizes, and exits `awaiting-judge`, printing the run path (under `~/.llm-council/council-runs/`).
 
-2. **Read ONLY the anonymized answers.** Read `<run>/JUDGE_INSTRUCTIONS.md` and every file in `<run>/public/answers/` (A.md, B.md, …). **Do NOT open `mapping.json`** — that would de-anonymize the council and defeat the seal.
+3. **Read ONLY the anonymized answers.** Read `<run>/JUDGE_INSTRUCTIONS.md` and every file in `<run>/public/answers/` (A.md, B.md, …). **Do NOT open `mapping.json`** — that would de-anonymize the council and defeat the seal.
 
-3. **Judge.** Follow the structure in JUDGE_INSTRUCTIONS verbatim (Recommendation / Confidence / Where they agree / Where they disagree + your ruling / Key risks / Next actions). Weigh the arguments on merit. Write your synthesis to `<run>/public/final_report.md`, starting with the header line `> **Council run** · Judge: main-session (handoff) · Models: …` copied from `<run>/meta.json` (`models_surviving`), plus any `diversity_notes`.
+4. **Judge.** Follow the structure in JUDGE_INSTRUCTIONS verbatim (Recommendation / Confidence / Where they agree / Where they disagree + your ruling / Key risks / Next actions). Weigh the arguments on merit. Write your synthesis to `<run>/public/final_report.md`, starting with the header line `> **Council run** · Judge: main-session (handoff) · Models: …` copied from `<run>/meta.json` (`models_surviving`), plus any `diversity_notes`.
 
-4. **Show the range, then the verdict (transparency).** Because the run is a blocking subprocess the user can't watch live, surface what each member contributed BEFORE your synthesis: a one-line-per-answer summary (each answer letter → its recommendation + confidence) so they see the spread of views, not just your conclusion. Then give the verdict + run path. Confirm `final_report.md` exists and is non-empty. If `meta.json` has a DIVERSITY WARNING (fewer than 3 models survived — e.g. a CLI was unauthenticated), surface it plainly and suggest re-running after fixing auth.
+5. **Show the range, then the verdict (transparency).** Because the run is a blocking subprocess the user can't watch live, surface what each member contributed BEFORE your synthesis: a one-line-per-answer summary (each answer letter → its recommendation + confidence) so they see the spread of views, not just your conclusion. Then give the verdict + run path. Confirm `final_report.md` exists and is non-empty. If `meta.json` has a DIVERSITY WARNING (fewer than 3 models survived — e.g. a CLI was unauthenticated), surface it plainly and suggest re-running after fixing auth.
 
-The default advise council is **7 lenses across 5 models** (architect, pragmatist, skeptic, first-principles, operator, user-advocate, realist). Edit `advise_agents` in `agents.yaml` to widen/narrow it.
+The full advise council is **7 lenses across 5 selectable models** (architect, pragmatist, skeptic, first-principles, operator, user-advocate, realist). You may widen or narrow lenses only within the five routes shown by `python3 -m council_runner --list-models`; unsupported custom model IDs fail loudly.
 
 ## Notes
 - **Don't answer from your own reasoning first.** The whole point is the sealed council; run it, then judge what it produced.

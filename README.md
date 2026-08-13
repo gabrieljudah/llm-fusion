@@ -4,8 +4,8 @@
 
 A **sealed multi-model LLM council** for Claude Code. One prompt → **Claude + Codex (GPT) + Antigravity (Gemini) + Grok (xAI) answer independently** (no peeking at each other) → anonymized → a judge fuses the best. Two commands:
 
-- **`/fusion-council "<question>"`** — 7 different expert lenses across 4 providers pressure-test a decision → you get a judged decision memo.
-- **`/fusion-build "<goal>"`** — a *build-off*: all 4 planning models plan the same task, the judge fuses the best plan, then it gets built and audited.
+- **`/fusion-council "<question>"`** — choose Claude Fable 5, Claude Opus 4.8, Codex GPT5.6 sol, Gemini 3.1, and/or Grok 4.6; 7 expert lenses pressure-test the decision → one judged memo.
+- **`/fusion-build "<goal>"`** — choose at least 3 models for a sealed build-off; the judge fuses the best plan, then it gets built and audited.
 
 This repo is both the **plugin** and its **marketplace** (the catalog Claude Code installs from).
 
@@ -31,7 +31,7 @@ cd plugins/llm-fusion
 python3 -m council_runner --doctor
 ```
 
-That's it — `/fusion-council` and `/fusion-build` are now available. Run folders are written to `~/.llm-council/council-runs/` (never inside the plugin).
+That's it — `/fusion-council` and `/fusion-build` are now available. Each asks which models to include; choose at least 3 across 2 providers, or use all five. Run folders are written to `~/.llm-council/council-runs/` (never inside the plugin).
 
 ## Update
 
@@ -57,4 +57,4 @@ plugins/llm-fusion/                 the plugin payload (self-contained)
 Full usage + design: [plugins/llm-fusion/README.md](plugins/llm-fusion/README.md).
 
 ## Note on cost / access
-The council spends **four** subscriptions per run (one call per provider/model seat, in parallel). It's a power-user tool — make sure members know they need all four CLIs before installing.
+The council uses the subscriptions behind the models selected for each run. It's a power-user tool — members need each selected provider CLI installed and authenticated.

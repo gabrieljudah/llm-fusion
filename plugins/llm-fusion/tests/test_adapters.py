@@ -81,7 +81,7 @@ class TestAdapters(unittest.TestCase):
 
     def test_grok_cli_is_supported_provider(self):
         self.assertIn("grok", SUPPORTED_CLIS)
-        spec = AgentSpec(name="grok-realist", cli="grok", model="grok-4", role="roles/realist.md")
+        spec = AgentSpec(name="grok-realist", cli="grok", model="grok-4.6", role="roles/realist.md")
         self.assertEqual(get_adapter(spec).cli_name, "grok")
 
     def test_grok_invoke_uses_headless_readonly_mode(self):
@@ -95,12 +95,12 @@ class TestAdapters(unittest.TestCase):
         grok.chmod(0o755)
         workdir = d / "work"
         workdir.mkdir()
-        spec = AgentSpec(name="grok-realist", cli="grok", model="grok-4", role="roles/realist.md")
+        spec = AgentSpec(name="grok-realist", cli="grok", model="grok-4.6", role="roles/realist.md")
         adapter = get_adapter(spec, login_path=str(d))
 
         result = asyncio.run(adapter.invoke(
             "Answer the brief.",
-            model="grok-4",
+            model="grok-4.6",
             workdir=workdir,
             timeout=5,
             role_text="You are the realist.",
@@ -114,7 +114,7 @@ class TestAdapters(unittest.TestCase):
         self.assertIn("You are the realist.", args_text)
         self.assertIn("Answer the brief.", args_text)
         self.assertIn("--model", args)
-        self.assertIn("grok-4", args)
+        self.assertIn("grok-4.6", args)
         self.assertIn("--output-format", args)
         self.assertIn("--permission-mode", args)
         self.assertIn("plan", args)
@@ -162,11 +162,11 @@ class TestAdapters(unittest.TestCase):
         self.assertNotIn("--yolo", args)
 
     def test_grok_executor_is_refused(self):
-        spec = AgentSpec(name="grok-builder", cli="grok", model="grok-4", role="roles/builder.md")
+        spec = AgentSpec(name="grok-builder", cli="grok", model="grok-4.6", role="roles/builder.md")
         adapter = get_adapter(spec)
         adapter.binary = "/bin/true"
         result = asyncio.run(adapter.invoke(
-            "build it", model="grok-4", workdir=Path(tempfile.mkdtemp()),
+            "build it", model="grok-4.6", workdir=Path(tempfile.mkdtemp()),
             timeout=5, execute=True, sandbox=Path(tempfile.mkdtemp()),
         ))
         self.assertEqual(result.status, Status.ERROR)

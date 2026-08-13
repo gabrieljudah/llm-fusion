@@ -17,6 +17,17 @@ python3 -m council_runner --doctor          # check all four CLIs are installed 
 
 ## Use
 
+Choose any three or more current models across at least two providers. Omit the flags to use all five:
+
+```bash
+python3 -m council_runner --list-models
+python3 -m council_runner --mode advise --judge handoff \
+  --model opus-4.8 --model gpt-5.6-sol --model gemini-3.1 \
+  --brief "Should I do X or Y?"
+```
+
+The visible choices are Claude **Fable 5**, Claude **Opus 4.8**, Codex **GPT5.6 sol**, **Gemini 3.1**, and **Grok 4.6**.
+
 ```bash
 # Council (advise) — you (the calling session) are the Judge:
 python3 -m council_runner --mode advise --judge handoff --brief "Should I do X or Y?"
@@ -44,7 +55,7 @@ From **Claude Code**, just use the skills: `/fusion-council "<question>"` and `/
 
 ## Config — `agents.yaml`
 
-The shipped roster has 7 advise agents and 4 execute planners across claude, codex, antigravity, and grok. Per-agent `name/cli/model/role` (+ optional `path`). `defaults` (timeouts/retries/quorum), `judge` (handoff|auto + cli/model), `executor` (codex), `auditor` (different model).
+The shipped roster has 7 advise agents and 5 execute planners across claude, codex, antigravity, and grok. Per-agent `name/cli/model/role` (+ optional `path`). `defaults` (timeouts/retries/quorum), `judge` (handoff|auto + cli/model), `executor` (codex), `auditor` (different model). v1.4 accepts the five routes listed by `--list-models`; an unsupported custom route fails loudly instead of silently shrinking the council.
 
 ## Layout
 
