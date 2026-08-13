@@ -2,6 +2,15 @@
 
 All notable changes to LLM Fusion.
 
+## [1.4.1] — 2026-08-13
+
+### Fixed
+- `--doctor --ping` now exercises every selected model route, including both Fable 5 and Opus 4.8 when both are selected, instead of deduplicating by provider CLI.
+- Custom rosters now fail loudly if any requested model seat is absent from either the advise or execute roster; receipts can no longer record a model that did not run.
+- Existing-member update instructions now include the required explicit `/plugin update llm-fusion@fusion` step after refreshing the marketplace.
+- Python package/runtime version metadata now matches the plugin and marketplace manifests.
+- Antigravity adapter tests now assert the verified `Gemini 3.1 Pro (High)` route rather than an obsolete preview identifier.
+
 ## [1.4.0] — 2026-08-13
 
 ### Added

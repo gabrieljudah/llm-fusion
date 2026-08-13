@@ -18,7 +18,7 @@ class TestAdapters(unittest.TestCase):
         spec = AgentSpec(
             name="antigravity-skeptic",
             cli="antigravity",
-            model="gemini-3.1-pro-preview",
+            model="Gemini 3.1 Pro (High)",
             role="roles/skeptic.md",
         )
         adapter = get_adapter(spec)
@@ -32,7 +32,7 @@ class TestAdapters(unittest.TestCase):
         spec = AgentSpec(
             name="antigravity-skeptic",
             cli="antigravity",
-            model="gemini-3.1-pro-preview",
+            model="Gemini 3.1 Pro (High)",
             role="roles/skeptic.md",
         )
 
@@ -52,14 +52,14 @@ class TestAdapters(unittest.TestCase):
         spec = AgentSpec(
             name="antigravity-skeptic",
             cli="antigravity",
-            model="gemini-3.1-pro-preview",
+            model="Gemini 3.1 Pro (High)",
             role="roles/skeptic.md",
         )
         adapter = get_adapter(spec, login_path=str(d))
 
         result = asyncio.run(adapter.invoke(
             "Answer the brief.",
-            model="gemini-3.1-pro-preview",
+            model="Gemini 3.1 Pro (High)",
             workdir=workdir,
             timeout=5,
             role_text="You are the skeptic.",
@@ -73,7 +73,7 @@ class TestAdapters(unittest.TestCase):
         self.assertIn("You are the skeptic.", args_text)
         self.assertIn("Answer the brief.", args_text)
         self.assertIn("--model", args)
-        self.assertIn("gemini-3.1-pro-preview", args)
+        self.assertIn("Gemini 3.1 Pro (High)", args)
         self.assertIn("--sandbox", args)
         self.assertNotIn("--output-format", args)
         self.assertNotIn("--approval-mode", args)

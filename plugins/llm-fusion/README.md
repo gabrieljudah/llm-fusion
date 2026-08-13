@@ -43,6 +43,16 @@ python3 -m council_runner --mode execute --judge auto    --brief "Build a CSV-to
 
 From **Claude Code**, just use the skills: `/fusion-council "<question>"` and `/fusion-build "<goal>"`.
 
+To update an existing installation, run all three steps:
+
+```text
+/plugin marketplace update fusion
+/plugin update llm-fusion@fusion
+/reload-plugins
+```
+
+Refreshing the marketplace alone does not replace the installed plugin cache.
+
 ## How the seal works
 
 | Threat | Defense |
