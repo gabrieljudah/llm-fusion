@@ -70,8 +70,16 @@ def select_models(roster: RosterConfig, keys: list[str] | tuple[str, ...] | None
 
     advise = _selected_specs(roster.advise_agents, selected)
     execute = _selected_specs(roster.execute_agents, selected)
-    if len({spec.model for spec in advise}) < 3 or len({spec.model for spec in execute}) < 3:
-        raise ValueError("selected models are not fully represented in the shipped roster")
+    expected_routes = {(choice.cli, choice.model): choice.key for choice in choices}
+    advise_routes = {(spec.cli, spec.model) for spec in advise}
+    execute_routes = {(spec.cli, spec.model) for spec in execute}
+    missing = sorted({
+        key
+        for route, key in expected_routes.items()
+        if route not in advise_routes or route not in execute_routes
+    })
+    if missing:
+        raise ValueError("missing requested model routes in roster: " + ", ".join(missing))
 
     # Auto-mode support follows the chosen provider seats. If both Claude
     # choices are present, Fable 5 remains the judge; otherwise use Opus 4.8.

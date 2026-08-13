@@ -10,7 +10,7 @@ from pathlib import Path
 
 from .adapters import SUPPORTED_CLIS, get_adapter
 from .core import AgentSpec, Status
-from .model_catalog import DEFAULT_MODEL_KEYS, MODEL_CHOICES, model_help, select_models
+from .model_catalog import BY_KEY, DEFAULT_MODEL_KEYS, MODEL_CHOICES, model_help, select_models
 from .flows import run_advise, run_execute
 from .orchestrator import (
     CouncilError,
@@ -83,6 +83,14 @@ def _doctor(roster, project_root: Path, login_path: str, runs_dir: Path, ping: b
     seen: dict[str, AgentSpec] = {}
     for a in roster.advise_agents + roster.execute_agents:
         seen.setdefault(a.cli, a)
+    selected_routes: list[AgentSpec] = []
+    all_specs = roster.advise_agents + roster.execute_agents
+    for key in roster.selected_models:
+        choice = BY_KEY[key]
+        selected_routes.append(next(
+            spec for spec in all_specs
+            if (spec.cli, spec.model) == (choice.cli, choice.model)
+        ))
     all_ready = True
     for cli in SUPPORTED_CLIS:
         spec = seen.get(cli) or AgentSpec(name=cli, cli=cli, model="?", role="-")
@@ -97,12 +105,13 @@ def _doctor(roster, project_root: Path, login_path: str, runs_dir: Path, ping: b
         print(f"  {mark} {cli:<12} installed={installed}  authed={authed}{where}")
         print(f"        {detail}{roster_note}")
         if ping and ready and in_roster:
-            res = asyncio.run(_ping_one(adapter, spec, runs_dir))
-            pmark = "✓" if res.status == Status.OK else "✗"
-            print(f"        {pmark} ping: {res.status.value}"
-                  + (f" — {res.error_detail}" if res.status != Status.OK else f" ({res.duration_s}s)"))
-            if res.status != Status.OK:
-                ready = False
+            for route_spec in (s for s in selected_routes if s.cli == cli):
+                res = asyncio.run(_ping_one(adapter, route_spec, runs_dir))
+                pmark = "✓" if res.status == Status.OK else "✗"
+                print(f"        {pmark} ping {route_spec.model}: {res.status.value}"
+                      + (f" — {res.error_detail}" if res.status != Status.OK else f" ({res.duration_s}s)"))
+                if res.status != Status.OK:
+                    ready = False
         if in_roster and not ready:
             all_ready = False
 
@@ -120,7 +129,8 @@ def _doctor(roster, project_root: Path, login_path: str, runs_dir: Path, ping: b
 
 
 async def _ping_one(adapter, spec: AgentSpec, runs_dir: Path):
-    wd = runs_dir / ".doctor" / spec.cli
+    safe_model = "".join(ch if ch.isalnum() or ch in "._-" else "-" for ch in spec.model)
+    wd = runs_dir / ".doctor" / spec.cli / safe_model
     wd.mkdir(parents=True, exist_ok=True)
     return await adapter.invoke("Reply with only the word READY.",
                                 model=spec.model, workdir=wd, timeout=90)

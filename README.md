@@ -36,10 +36,12 @@ That's it — `/fusion-council` and `/fusion-build` are now available. Each asks
 ## Update
 
 ```
-/plugin marketplace update fusion   →   /reload-plugins
+/plugin marketplace update fusion
+/plugin update llm-fusion@fusion
+/reload-plugins
 ```
 
-Auto-update can be toggled in `/plugin` → Marketplaces. Each release bumps the version in `plugin.json` + `marketplace.json` and is git-tagged (`v1.2.0`, …); see [the plugin CHANGELOG](plugins/llm-fusion/CHANGELOG.md).
+Refreshing the marketplace alone does **not** update an already-installed plugin; run the explicit plugin update step above. Auto-update can be toggled in `/plugin` → Marketplaces. Each release bumps the version in `plugin.json` + `marketplace.json` and is git-tagged; see [the plugin CHANGELOG](plugins/llm-fusion/CHANGELOG.md).
 
 ## What's inside
 

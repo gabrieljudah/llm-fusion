@@ -4,14 +4,16 @@ import tempfile
 import unittest
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from council_runner.cli import build_parser, main  # noqa: E402
+from council_runner.cli import _doctor, build_parser, main  # noqa: E402
 from council_runner.model_catalog import BY_KEY, MODEL_CHOICES, select_models  # noqa: E402
 from council_runner.orchestrator import load_roster  # noqa: E402
-from council_runner.core import AgentSpec  # noqa: E402
+from council_runner.core import AgentSpec, Status  # noqa: E402
 
 
 class TestModelCatalog(unittest.TestCase):
@@ -63,6 +65,39 @@ class TestModelCatalog(unittest.TestCase):
         roster = replace(self.roster, advise_agents=self.roster.advise_agents + [custom])
         with self.assertRaisesRegex(ValueError, "outside the v1.4 catalog"):
             select_models(roster, None)
+
+    def test_missing_requested_route_fails_loudly_instead_of_being_recorded(self):
+        advise = [a for a in self.roster.advise_agents if a.model != "grok-4.6"]
+        execute = [a for a in self.roster.execute_agents if a.model != "grok-4.6"]
+        partial = replace(self.roster, advise_agents=advise, execute_agents=execute)
+        with self.assertRaisesRegex(ValueError, "missing requested model routes.*grok-4.6"):
+            select_models(partial, None)
+
+    def test_doctor_ping_exercises_each_selected_model_route(self):
+        selected = select_models(self.roster, None)
+        pinged = []
+
+        class FakeAdapter:
+            binary = "/fake/bin"
+
+            def installed(self):
+                return True
+
+            def auth_check(self):
+                return True, "authenticated"
+
+            async def invoke(self, prompt, *, model, workdir, timeout):
+                pinged.append(model)
+                return SimpleNamespace(status=Status.OK, duration_s=0.01, error_detail="")
+
+        with patch("council_runner.cli.get_adapter", return_value=FakeAdapter()):
+            rc = _doctor(selected, ROOT, "", Path(tempfile.mkdtemp()), ping=True)
+
+        self.assertEqual(rc, 0)
+        self.assertEqual(
+            pinged,
+            ["claude-fable-5", "claude-opus-4-8", "gpt-5.6-sol", "Gemini 3.1 Pro (High)", "grok-4.6"],
+        )
 
     def test_cli_accepts_repeated_model_flags(self):
         args = build_parser().parse_args([
