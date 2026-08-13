@@ -1,7 +1,7 @@
 {
   "name": "llm-fusion",
-  "version": "1.2.0",
-  "description": "LLM Fusion — sealed multi-model council for Claude Code. Claude + Codex + Antigravity + Grok answer and build independently, anonymized, then a judge fuses the best (many models in, one fused answer out). Adds /fusion-council (decisions) and /fusion-build (build-off). Requires the claude, codex, agy, and grok CLIs installed + authenticated, and Python 3.11+.",
+  "version": "1.4.0",
+  "description": "LLM Fusion — choose Fable 5, Opus 4.8, GPT5.6 sol, Gemini 3.1, and Grok 4.6 for a sealed Claude Code council. Models answer and plan independently, anonymized, then a judge fuses the best. Adds /fusion-council and /fusion-build. Requires the claude, codex, agy, and grok CLIs plus Python 3.11+.",
   "author": { "name": "Gabriel Judah" },
   "keywords": ["llm", "fusion", "council", "multi-model", "claude", "codex", "antigravity", "grok", "xai"]
 }

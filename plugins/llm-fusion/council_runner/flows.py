@@ -64,7 +64,8 @@ def _write_handoff(template: str, brief: str, answers, paths: RunPaths, mode: st
 async def run_advise(roster, project_root, login_path, prompts, brief, runs_base, backend) -> RunPaths:
     paths = create_run_folder(runs_base, "advise", brief)
     write_meta(paths, mode="advise", brief=brief, started=now_iso(), judge_backend=backend,
-               roster=[asdict(a) for a in roster.advise_agents], status="running")
+               roster=[asdict(a) for a in roster.advise_agents],
+               selected_models=roster.selected_models, status="running")
 
     results = await run_round1(roster, roster.advise_agents, project_root, login_path,
                                paths, prompts["round1_advise"], brief)
@@ -102,6 +103,7 @@ async def run_execute(roster, project_root, login_path, prompts, brief, runs_bas
     paths = create_run_folder(runs_base, "execute", brief)
     write_meta(paths, mode="execute", brief=brief, started=now_iso(), judge_backend=backend,
                roster=[asdict(a) for a in roster.execute_agents], status="running",
+               selected_models=roster.selected_models,
                workspace=str(workspace) if workspace else None)
 
     results = await run_round1(roster, roster.execute_agents, project_root, login_path,

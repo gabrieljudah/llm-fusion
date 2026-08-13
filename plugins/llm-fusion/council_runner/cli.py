@@ -10,6 +10,7 @@ from pathlib import Path
 
 from .adapters import SUPPORTED_CLIS, get_adapter
 from .core import AgentSpec, Status
+from .model_catalog import DEFAULT_MODEL_KEYS, MODEL_CHOICES, model_help, select_models
 from .flows import run_advise, run_execute
 from .orchestrator import (
     CouncilError,
@@ -64,6 +65,13 @@ def build_parser() -> argparse.ArgumentParser:
                    help="path to agents.yaml")
     p.add_argument("--runs-dir", default=str(data_dir() / "council-runs"),
                    help="where run folders are created (persistent, outside the plugin dir)")
+    p.add_argument(
+        "--model", dest="models", action="append",
+        choices=[choice.key for choice in MODEL_CHOICES],
+        help="model to include; repeat to choose 3+ models. Default: all five. " + model_help(),
+    )
+    p.add_argument("--list-models", action="store_true",
+                   help="show selectable model labels and provider CLI IDs, then exit")
     p.add_argument("--doctor", action="store_true", help="report per-CLI readiness and exit")
     p.add_argument("--ping", action="store_true",
                    help="with --doctor: fire one real round-1 call per CLI to prove the live path")
@@ -106,6 +114,7 @@ def _doctor(roster, project_root: Path, login_path: str, runs_dir: Path, ping: b
           f"{len(e_models)} models: {', '.join(e_models)}")
     print(f"  judge backend: {roster.judge.get('backend', 'handoff')}  "
           f"executor: {roster.executor.get('cli')}/{roster.executor.get('model')}")
+    print(f"  selected models: {', '.join(roster.selected_models)}")
     print(f"\n  overall: {'READY' if all_ready else 'NOT READY — fix the ✗ rows above'}")
     return 0 if all_ready else 1
 
@@ -128,10 +137,18 @@ def main(argv: list[str] | None = None) -> int:
     runs_dir = Path(args.runs_dir).expanduser().resolve()
     login_path = get_login_path()
 
+    if args.list_models:
+        print("Selectable LLM Fusion models:\n")
+        for choice in MODEL_CHOICES:
+            default = "  [default]" if choice.key in DEFAULT_MODEL_KEYS else ""
+            print(f"  {choice.key:<14} {choice.provider}: {choice.display} -> {choice.cli}/{choice.model}{default}")
+        return 0
+
     try:
         roster = load_roster(agents_yaml)
+        roster = select_models(roster, args.models)
         prompts = load_prompts(project_root)
-    except CouncilError as e:
+    except (CouncilError, ValueError) as e:
         print(f"error: {e}", file=sys.stderr)
         return 2
 
@@ -146,6 +163,15 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     backend = args.judge or roster.judge.get("backend", "handoff")
+    if backend == "auto" and not roster.judge.get("cli"):
+        print("error: --judge auto requires selecting Fable 5 or Opus 4.8", file=sys.stderr)
+        return 2
+    if backend == "auto" and args.mode == "execute" and not roster.executor.get("cli"):
+        print("error: auto execute requires selecting GPT5.6 sol", file=sys.stderr)
+        return 2
+    if backend == "auto" and args.mode == "execute" and not roster.auditor.get("cli"):
+        print("error: auto execute requires selecting Gemini 3.1 for the independent audit", file=sys.stderr)
+        return 2
     workspace = Path(args.workspace).expanduser().resolve() if args.workspace else None
     runs_dir.mkdir(parents=True, exist_ok=True)
 

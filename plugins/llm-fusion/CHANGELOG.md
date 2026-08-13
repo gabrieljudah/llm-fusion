@@ -2,7 +2,21 @@
 
 All notable changes to LLM Fusion.
 
-## Unreleased
+## [1.4.0] — 2026-08-13
+
+### Added
+- **Member-selectable model roster.** `/fusion-council` and `/fusion-build` now ask which models to use, then pass repeatable `--model` flags. The five exact visible choices are Claude **Fable 5**, Claude **Opus 4.8**, Codex **GPT5.6 sol**, **Gemini 3.1**, and **Grok 4.6**. No choice means all five; custom councils require at least three models across two providers.
+- **Single model catalog.** Stable member labels are translated centrally to live-tested CLI identifiers: `claude-fable-5`, `claude-opus-4-8`, `gpt-5.6-sol`, `Gemini 3.1 Pro (High)`, and `grok-4.6`.
+- `--list-models` exposes the available choices and exact provider routes. Selected model keys are saved into every run's `meta.json` receipt.
+- Selection contract tests plus a successful manual three-model council run; all five provider routes passed the live `--doctor --ping` release check.
+
+### Changed
+- Default executor upgraded from GPT-5.5 to **GPT5.6 sol**.
+- Full build-off now contains five model seats instead of four because Fable 5 and Opus 4.8 are independent Claude choices.
+- Gemini's active Antigravity identifier updated to `Gemini 3.1 Pro (High)`; the previous preview slug is no longer accepted by current `agy`.
+- Grok upgraded to **Grok 4.6**.
+
+## [1.3.1] — 2026-06-30
 
 ### Added
 - **Grok (xAI) as a 4th provider.** New `GrokAdapter` (`council_runner/adapters/grok.py`) drives the xAI Grok Build CLI (`grok`) in headless read-only mode (`-p … --output-format json --permission-mode plan --no-memory --no-subagents --verbatim --tools ""`), with a defensive extractor that tolerates json / streaming-json / plain-text output. Registered in the adapter registry; `roles/realist.md` adds the *realist* lens (live market/world reality, timing, data-grounded risk). Roster: `grok-realist` joins `advise_agents` (now 7 lenses across 5 models) and `grok-builder` joins `execute_agents` (4 models). Grok advises and plans only — it never executes; the autonomous executor stays codex-only. Verified live against `grok` 0.2.77 (`--doctor --ping`).

@@ -82,6 +82,7 @@ class RosterConfig:
     auditor: dict
     advise_agents: list[AgentSpec]    # diverse lenses (advise mode)
     execute_agents: list[AgentSpec]   # same builder role, one per model (execute)
+    selected_models: list[str] = field(default_factory=list)
 
     def agents_for(self, mode: str) -> list[AgentSpec]:
         return self.execute_agents if mode == "execute" else self.advise_agents
