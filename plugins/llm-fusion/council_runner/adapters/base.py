@@ -137,6 +137,7 @@ class Adapter(ABC):
         role_path: Path | None = None,
         execute: bool = False,
         sandbox: Path | None = None,
+        effort: str | None = None,
     ) -> AgentResult:
         ...
 

@@ -34,12 +34,13 @@ class CodexAdapter(Adapter):
 
     async def invoke(
         self, prompt, *, model, workdir, timeout,
-        role_text=None, role_path=None, execute=False, sandbox=None,
+        role_text=None, role_path=None, execute=False, sandbox=None, effort=None,
     ) -> AgentResult:
         if not self.installed():
             return self._result(status=Status.NOT_INSTALLED, detail="codex not on PATH")
 
         full_prompt = f"{role_text}\n\n{prompt}" if role_text else prompt
+        eff = ["-c", f"model_reasoning_effort={effort}"] if effort else []  # council: reasoning tier
 
         if execute:
             if sandbox is None:
@@ -50,6 +51,7 @@ class CodexAdapter(Adapter):
                 "-s", "workspace-write",
                 "-C", str(sbx),
                 "-m", model,
+                *eff,
                 "-c", f'sandbox_workspace_write.writable_roots=["{sbx}"]',
                 "-c", "sandbox_workspace_write.exclude_tmpdir_env_var=true",
                 "-c", "sandbox_workspace_write.exclude_slash_tmp=true",
@@ -62,7 +64,7 @@ class CodexAdapter(Adapter):
             argv = self._base_argv(out_file) + [
                 "-s", "read-only",
                 "-m", model,
-                "-c", "model_reasoning_effort=xhigh",   # council: max reasoning tier
+                *eff,
                 full_prompt,
             ]
             cwd = workdir

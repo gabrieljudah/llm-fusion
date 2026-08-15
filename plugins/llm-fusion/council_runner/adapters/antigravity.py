@@ -15,6 +15,31 @@ from ..core import AgentResult, Status
 # antigravity/gemini collapses several failures into exit 1; these subcodes are terminal.
 _TERMINAL_EXIT = {42, 53}
 
+# agy encodes the reasoning tier in the model NAME (e.g. "Gemini 3.1 Pro (High)").
+# Map a configured slug + a global effort level to that display name. Gemini Pro
+# exposes Low/High only; Flash adds Medium. Already-leveled names or non-gemini
+# models pass through unchanged (the seat just runs at its configured model).
+_GEMINI_PRO_LEVEL = {"low": "Low", "minimal": "Low", "medium": "Low",
+                     "high": "High", "xhigh": "High", "max": "High"}
+_GEMINI_FLASH_LEVEL = {"low": "Low", "minimal": "Low", "medium": "Medium",
+                       "high": "High", "xhigh": "High", "max": "High"}
+
+
+def _gemini_model_for_effort(model: str, effort: str) -> str:
+    m = model.strip()
+    low = m.lower()
+    if "(" in m or not low.startswith("gemini"):
+        return m
+    fam = " ".join(p.capitalize() if p in ("gemini", "pro", "flash") else p
+                   for p in low.split("-") if p != "preview")
+    if "flash" in low:
+        lvl = _GEMINI_FLASH_LEVEL.get(effort.lower())
+    elif "pro" in low:
+        lvl = _GEMINI_PRO_LEVEL.get(effort.lower())
+    else:
+        return m
+    return f"{fam} ({lvl})" if lvl else m
+
 
 class AntigravityAdapter(Adapter):
     cli_name = "antigravity"
@@ -26,7 +51,7 @@ class AntigravityAdapter(Adapter):
 
     async def invoke(
         self, prompt, *, model, workdir, timeout,
-        role_text=None, role_path=None, execute=False, sandbox=None,
+        role_text=None, role_path=None, execute=False, sandbox=None, effort=None,
     ) -> AgentResult:
         if not self.installed():
             return self._result(status=Status.NOT_INSTALLED, detail="agy not on PATH")
@@ -36,6 +61,8 @@ class AntigravityAdapter(Adapter):
                 detail="antigravity executor deferred to v2 (no OS fs sandbox); use codex executor",
             )
         full_prompt = f"{role_text}\n\n{prompt}" if role_text else prompt
+        if effort:                                    # council: reasoning tier (encoded in model name)
+            model = _gemini_model_for_effort(model, effort)
         argv = [
             self.binary,
             "--print", full_prompt,

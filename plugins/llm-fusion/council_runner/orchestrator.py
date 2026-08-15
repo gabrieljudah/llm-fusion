@@ -154,14 +154,14 @@ def _parse_retry_after(text: str) -> int | None:
 
 
 async def _run_one_agent(adapter, *, prompt, model, workdir, timeout, retries,
-                         role_text, role_path) -> AgentResult:
+                         role_text, role_path, effort=None) -> AgentResult:
     attempts = 0
     last: AgentResult | None = None
     while True:
         attempts += 1
         res = await adapter.invoke(
             prompt, model=model, workdir=workdir, timeout=timeout,
-            role_text=role_text, role_path=role_path,
+            role_text=role_text, role_path=role_path, effort=effort,
         )
         res.attempts = attempts
         last = res
@@ -195,7 +195,7 @@ async def run_round1(roster: RosterConfig, agents: list[AgentSpec], project_root
         res = await _run_one_agent(
             adapter, prompt=prompt, model=agent.model, workdir=agent_dir,
             timeout=roster.round1_timeout, retries=roster.retries,
-            role_text=role_text, role_path=role_path,
+            role_text=role_text, role_path=role_path, effort=roster.effort,
         )
         _write_agent_artifacts(agent_dir, res)
         mark = "✓" if res.ok else "✗"

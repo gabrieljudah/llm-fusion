@@ -9,13 +9,13 @@ You orchestrate a **sealed council** of real, different models, then you are the
 
 ## Steps
 
-1. **Run the council** (advise mode, you judge). Locate the bundled runner (works installed or from a dev checkout), then run it:
+1. **Pick the reasoning tier, then run the council** (advise mode, you judge). FIRST ask the user how hard the council should think — one global tier applied to every model: **low / medium / high / xhigh** (default **high**) — with a quick multiple-choice question; this is theirs to customise each run. Then locate the bundled runner and run it, passing their pick as `--effort` (it maps to each CLI's own knob — claude `--effort`, codex `model_reasoning_effort`, grok `--reasoning-effort`, gemini's leveled model — so all four models genuinely change tier):
    ```bash
    PLUGIN="${CLAUDE_PLUGIN_ROOT:-$(ls -d "$HOME"/.claude/plugins/cache/*/llm-fusion/*/ 2>/dev/null | sort -V | tail -1)}"
    PLUGIN="${PLUGIN:-$HOME/projects/llm-fusion/plugins/llm-fusion}"
-   cd "$PLUGIN" && python3 -m council_runner --mode advise --judge handoff --brief "<the user's question, verbatim or lightly cleaned>"
+   cd "$PLUGIN" && python3 -m council_runner --mode advise --judge handoff --effort "<low|medium|high|xhigh>" --brief "<the user's question, verbatim or lightly cleaned>"
    ```
-   It fans out to the roster in `agents.yaml`, runs sealed Round 1 in parallel, anonymizes, and exits `awaiting-judge`, printing the run path (under `~/.llm-council/council-runs/`).
+   It fans out to the roster in `agents.yaml`, runs sealed Round 1 in parallel, anonymizes, and exits `awaiting-judge`, printing the run path (under `~/.llm-council/council-runs/`). If the user didn't specify a tier and you didn't ask, omit `--effort` (the roster default applies).
 
 2. **Read ONLY the anonymized answers.** Read `<run>/JUDGE_INSTRUCTIONS.md` and every file in `<run>/public/answers/` (A.md, B.md, …). **Do NOT open `mapping.json`** — that would de-anonymize the council and defeat the seal.
 
@@ -23,7 +23,7 @@ You orchestrate a **sealed council** of real, different models, then you are the
 
 4. **Show the range, then the verdict (transparency).** Because the run is a blocking subprocess the user can't watch live, surface what each member contributed BEFORE your synthesis: a one-line-per-answer summary (each answer letter → its recommendation + confidence) so they see the spread of views, not just your conclusion. Then give the verdict + run path. Confirm `final_report.md` exists and is non-empty. If `meta.json` has a DIVERSITY WARNING (fewer than 3 models survived — e.g. a CLI was unauthenticated), surface it plainly and suggest re-running after fixing auth.
 
-The default advise council is **7 lenses across 5 models** (architect, pragmatist, skeptic, first-principles, operator, user-advocate, realist). Edit `advise_agents` in `agents.yaml` to widen/narrow it.
+The default advise council is **7 lenses across 4 models** (architect, pragmatist, skeptic, first-principles, operator, user-advocate, realist). Edit `advise_agents` in `agents.yaml` to widen/narrow it, and set the default reasoning tier via `defaults.effort` (or per run with `--effort`).
 
 ## Notes
 - **Don't answer from your own reasoning first.** The whole point is the sealed council; run it, then judge what it produced.

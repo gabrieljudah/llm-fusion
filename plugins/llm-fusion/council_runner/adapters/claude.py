@@ -19,7 +19,7 @@ class ClaudeAdapter(Adapter):
 
     async def invoke(
         self, prompt, *, model, workdir, timeout,
-        role_text=None, role_path=None, execute=False, sandbox=None,
+        role_text=None, role_path=None, execute=False, sandbox=None, effort=None,
     ) -> AgentResult:
         if not self.installed():
             return self._result(status=Status.NOT_INSTALLED, detail="claude not on PATH")
@@ -37,6 +37,8 @@ class ClaudeAdapter(Adapter):
             "--tools", "",
             "--strict-mcp-config",
         ]
+        if effort:
+            argv += ["--effort", effort]   # council: reasoning tier
         if role_text:
             argv += ["--append-system-prompt", role_text]
 

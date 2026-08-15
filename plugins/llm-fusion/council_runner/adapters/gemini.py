@@ -27,8 +27,10 @@ class GeminiAdapter(Adapter):
 
     async def invoke(
         self, prompt, *, model, workdir, timeout,
-        role_text=None, role_path=None, execute=False, sandbox=None,
+        role_text=None, role_path=None, execute=False, sandbox=None, effort=None,
     ) -> AgentResult:
+        # effort accepted for interface parity; the gemini-cli fallback selects
+        # reasoning via the model slug, not a flag, so it is not applied here.
         if not self.installed():
             return self._result(status=Status.NOT_INSTALLED, detail="gemini not on PATH")
         if execute:

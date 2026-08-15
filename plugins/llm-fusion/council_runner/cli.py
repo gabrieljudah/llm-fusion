@@ -64,6 +64,10 @@ def build_parser() -> argparse.ArgumentParser:
                    help="path to agents.yaml")
     p.add_argument("--runs-dir", default=str(data_dir() / "council-runs"),
                    help="where run folders are created (persistent, outside the plugin dir)")
+    p.add_argument("--effort", choices=["low", "medium", "high", "xhigh"], default=None,
+                   help="reasoning tier for every council member; maps to each CLI's own knob "
+                        "(claude --effort, codex model_reasoning_effort, grok --reasoning-effort, "
+                        "gemini leveled model). Overrides defaults.effort in agents.yaml.")
     p.add_argument("--doctor", action="store_true", help="report per-CLI readiness and exit")
     p.add_argument("--ping", action="store_true",
                    help="with --doctor: fire one real round-1 call per CLI to prove the live path")
@@ -106,6 +110,7 @@ def _doctor(roster, project_root: Path, login_path: str, runs_dir: Path, ping: b
           f"{len(e_models)} models: {', '.join(e_models)}")
     print(f"  judge backend: {roster.judge.get('backend', 'handoff')}  "
           f"executor: {roster.executor.get('cli')}/{roster.executor.get('model')}")
+    print(f"  reasoning effort: {roster.effort or 'per-CLI default'}")
     print(f"\n  overall: {'READY' if all_ready else 'NOT READY — fix the ✗ rows above'}")
     return 0 if all_ready else 1
 
@@ -134,6 +139,9 @@ def main(argv: list[str] | None = None) -> int:
     except CouncilError as e:
         print(f"error: {e}", file=sys.stderr)
         return 2
+
+    if args.effort:
+        roster.defaults["effort"] = args.effort
 
     if args.doctor:
         return _doctor(roster, project_root, login_path, runs_dir, args.ping)

@@ -31,7 +31,7 @@ class GrokAdapter(Adapter):
 
     async def invoke(
         self, prompt, *, model, workdir, timeout,
-        role_text=None, role_path=None, execute=False, sandbox=None,
+        role_text=None, role_path=None, execute=False, sandbox=None, effort=None,
     ) -> AgentResult:
         if not self.installed():
             return self._result(status=Status.NOT_INSTALLED, detail="grok not on PATH")
@@ -41,11 +41,12 @@ class GrokAdapter(Adapter):
                 detail="grok executor not supported (no OS fs sandbox); use codex executor",
             )
         full_prompt = f"{role_text}\n\n{prompt}" if role_text else prompt
+        eff = ["--reasoning-effort", effort] if effort else []   # council: reasoning tier
         argv = [
             self.binary,
             "-p", full_prompt,
             "--model", model,
-            "--reasoning-effort", "high",   # council: max reasoning tier
+            *eff,
             "--output-format", self.OUTPUT_FORMAT,
             "--permission-mode", self.PERMISSION_MODE,
             "--no-memory",

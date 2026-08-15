@@ -14,6 +14,9 @@ defaults:
   executor_timeout_sec: 900
   retries: 1
   quorum: 2
+  # global reasoning tier for every round-1 member (low|medium|high|xhigh).
+  # per-run override: --effort. Maps to each CLI's own knob.
+  effort: high
 
 # handoff = the main Claude Code session is the Judge (default).
 # auto    = runner spawns a fresh judge CLI (headless / unattended runs).

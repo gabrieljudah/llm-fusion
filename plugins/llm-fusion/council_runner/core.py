@@ -110,6 +110,14 @@ class RosterConfig:
     def quorum(self) -> int:
         return int(self.d("quorum", 2))
 
+    @property
+    def effort(self) -> str | None:
+        """Global reasoning tier applied to every round-1 council member
+        (low|medium|high|xhigh). None => each CLI's own default. Overridable
+        per-run via --effort; the persistent default lives in defaults.effort."""
+        v = self.d("effort", None)
+        return str(v).strip().lower() if v else None
+
 
 # --------------------------------------------------------------------------- #
 # YAML subset loader (zero-dep fallback)
