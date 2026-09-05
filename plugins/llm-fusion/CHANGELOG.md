@@ -2,6 +2,21 @@
 
 All notable changes to LLM Fusion.
 
+## [1.5.0] — 2026-09-05
+
+### Changed
+- **Roster refreshed to one frontier model per vendor:** Claude **Fable 5.1** (`claude-fable-5-1`), Codex **GPT-6 Astra** (`gpt-6-astra`), and **Grok 4.6** (`grok-4.6`). `--list-models` shows exactly these three; no selection runs all three.
+- Default judge → Fable 5.1; default sandboxed executor → GPT-6 Astra; independent auditor → Grok 4.6 (a third vendor, replacing the Antigravity/Gemini auditor).
+- Codex seats now pass `model_reasoning_effort="xhigh"` explicitly — `--ignore-user-config` (the memory-off guard) also dropped the configured effort, so council seats were silently running at the model default.
+- Advise roster stays 7 lenses (architect / pragmatist / skeptic / first-principles / operator / user-advocate / realist), now spread over the three models; build-off has one builder per model (3 seats).
+
+### Removed
+- Opus 4.8 and Gemini 3.1 (Antigravity) retired from the shipped catalog and roster. The antigravity and gemini adapters remain in the tree as latent fallbacks; re-listing a route is one `ModelChoice` line in `council_runner/model_catalog.py` plus roster seats.
+- Antigravity (`agy`) is no longer a prerequisite — members need the `claude`, `codex`, and `grok` CLIs.
+
+### Requires
+- GPT-6 Astra needs Codex CLI ≥ 0.153 (older CLIs answer "requires a newer version of Codex"; upgrade with `npm install -g @openai/codex@latest`).
+
 ## [1.4.1] — 2026-08-13
 
 ### Fixed

@@ -1,6 +1,6 @@
 # LLM Fusion — Sealed Multi-Model Council Runner
 
-One prompt → **claude + codex + antigravity + grok answer independently** (sealed, no cross-talk) → answers anonymized → a **Judge** synthesizes. Two modes:
+One prompt → **Claude Fable 5.1 + Codex GPT-6 Astra + Grok 4.6 answer independently** (sealed, no cross-talk) → answers anonymized → a **Judge** synthesizes. Two modes:
 
 - **advise (council):** members give views → Judge → decision memo.
 - **execute (fusion):** members each *plan* → Judge synthesizes one execution spec → it gets built (by you, or by a sandboxed executor) → audited.
@@ -12,21 +12,21 @@ The core value is the **seal**: in Round 1 no model sees another's answer and no
 ```bash
 cd /path/to/llm-fusion/plugins/llm-fusion
 # zero runtime deps; Python 3.11+. (PyYAML optional — a bundled subset loader reads agents.yaml without it.)
-python3 -m council_runner --doctor          # check all four CLIs are installed + authed
+python3 -m council_runner --doctor          # check all three CLIs are installed + authed
 ```
 
 ## Use
 
-Choose any three or more current models across at least two providers. Omit the flags to use all five:
+The council seats one frontier model per vendor. Omit the `--model` flags to run all three (the default and the minimum):
 
 ```bash
 python3 -m council_runner --list-models
 python3 -m council_runner --mode advise --judge handoff \
-  --model opus-4.8 --model gpt-5.6-sol --model gemini-3.1 \
+  --model fable-5.1 --model gpt-6-astra --model grok-4.6 \
   --brief "Should I do X or Y?"
 ```
 
-The visible choices are Claude **Fable 5**, Claude **Opus 4.8**, Codex **GPT5.6 sol**, **Gemini 3.1**, and **Grok 4.6**.
+The routes are Claude **Fable 5.1** (`claude-fable-5-1`), Codex **GPT-6 Astra** (`gpt-6-astra`, reasoning effort xhigh), and **Grok 4.6** (`grok-4.6`).
 
 ```bash
 # Council (advise) — you (the calling session) are the Judge:
@@ -38,7 +38,7 @@ python3 -m council_runner --mode advise --judge auto --brief "Should I do X or Y
 
 # Fusion (execute) — plan with all models, then build:
 python3 -m council_runner --mode execute --judge handoff --brief "Build a CSV-to-JSON converter" --workspace /path/to/repo
-python3 -m council_runner --mode execute --judge auto    --brief "Build a CSV-to-JSON converter"   # sandboxed codex executor + auditor
+python3 -m council_runner --mode execute --judge auto    --brief "Build a CSV-to-JSON converter"   # sandboxed codex executor + grok auditor
 ```
 
 From **Claude Code**, just use the skills: `/fusion-council "<question>"` and `/fusion-build "<goal>"`.
@@ -65,7 +65,7 @@ Refreshing the marketplace alone does not replace the installed plugin cache.
 
 ## Config — `agents.yaml`
 
-The shipped roster has 7 advise agents and 5 execute planners across claude, codex, antigravity, and grok. Per-agent `name/cli/model/role` (+ optional `path`). `defaults` (timeouts/retries/quorum), `judge` (handoff|auto + cli/model), `executor` (codex), `auditor` (different model). v1.4 accepts the five routes listed by `--list-models`; an unsupported custom route fails loudly instead of silently shrinking the council.
+The shipped roster has 7 advise agents and 3 execute planners across claude, codex, and grok. Per-agent `name/cli/model/role` (+ optional `path`). `defaults` (timeouts/retries/quorum), `judge` (handoff|auto + cli/model), `executor` (codex), `auditor` (grok — a different vendor). v1.5 accepts the three routes listed by `--list-models`; an unsupported custom route fails loudly instead of silently shrinking the council.
 
 ## Layout
 
@@ -78,4 +78,4 @@ python3 -m unittest discover -s tests                       # fast, no CLI calls
 COUNCIL_LIVE_TESTS=1 python3 -m unittest discover -s tests -p 'test_sandbox_escape.py'   # live codex escape proof
 ```
 
-v2 (deferred): web dashboard, MCP tool, claude/antigravity sandboxed executors.
+v2 (deferred): web dashboard, MCP tool, claude/grok sandboxed executors.

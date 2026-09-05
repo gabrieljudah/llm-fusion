@@ -1,15 +1,15 @@
 {
   "name": "fusion",
-  "description": "LLM Fusion — a selectable sealed multi-model council for Claude Code.",
+  "description": "LLM Fusion — a sealed multi-model council for Claude Code.",
   "owner": { "name": "Gabriel Judah" },
   "plugins": [
     {
       "name": "llm-fusion",
       "source": "./plugins/llm-fusion",
-      "version": "1.4.1",
-      "description": "LLM Fusion — choose Fable 5, Opus 4.8, GPT5.6 sol, Gemini 3.1, and Grok 4.6 for a sealed Claude Code council. Models answer and plan independently, anonymized, then a judge fuses the best. Commands: /fusion-council and /fusion-build.",
+      "version": "1.5.0",
+      "description": "LLM Fusion — Claude Fable 5.1, Codex GPT-6 Astra, and Grok 4.6 as one sealed Claude Code council. Models answer and plan independently, anonymized, then a judge fuses the best. Commands: /fusion-council and /fusion-build.",
       "author": { "name": "Gabriel Judah" },
-      "keywords": ["llm", "fusion", "council", "multi-model", "claude", "codex", "antigravity", "grok", "xai"]
+      "keywords": ["llm", "fusion", "council", "multi-model", "claude", "codex", "grok", "xai"]
     }
   ]
 }

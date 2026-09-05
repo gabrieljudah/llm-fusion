@@ -7,6 +7,9 @@
 #                     then the judge fuses the best of each)
 #
 # Subset YAML only (maps + lists of inline {flow} mappings).
+#
+# v1.5 roster (2026-09-05): one frontier model per vendor —
+#   Claude Fable 5.1 (claude-fable-5-1) · Codex GPT-6 Astra (gpt-6-astra) · Grok 4.6
 
 defaults:
   round1_timeout_sec: 300
@@ -20,29 +23,30 @@ defaults:
 judge:
   backend: handoff
   cli: claude
-  model: claude-fable-5
+  model: claude-fable-5-1
 
 # execute mode: the autonomous executor is codex-only (the only CLI with a real
-# OS seatbelt). Auditor is a different model on purpose.
+# OS seatbelt). Auditor is a different vendor on purpose (Grok reads the
+# deliverable that is handed to it inside the prompt; it never executes).
 executor:
   cli: codex
-  model: gpt-5.6-sol
+  model: gpt-6-astra
 auditor:
-  cli: antigravity
-  model: Gemini 3.1 Pro (High)
+  cli: grok
+  model: grok-4.6
 
-# ---- ADVISE: 7 lenses across 5 selectable current models ---------------------
-# Each model wears a DIFFERENT lens. Any lens can ride any model — this pairing
+# ---- ADVISE: 7 lenses across the 3 current models -----------------------------
+# Each seat wears a DIFFERENT lens. Any lens can ride any model — this pairing
 # is editable; the only hard rule is >=3 distinct models. Providers: claude,
-# codex, antigravity, grok (4 vendors; Claude offers Fable 5 + Opus 4.8).
+# codex, grok (3 vendors, one frontier model each).
 advise_agents:
-  - { name: claude-architect,       cli: claude, model: claude-fable-5, role: roles/architect.md }
-  - { name: codex-pragmatist,       cli: codex,  model: gpt-5.6-sol,    role: roles/pragmatist.md }
-  - { name: antigravity-skeptic,    cli: antigravity, model: Gemini 3.1 Pro (High), role: roles/skeptic.md }
-  - { name: claude-firstprinciples, cli: claude, model: claude-opus-4-8, role: roles/first-principles.md }
-  - { name: antigravity-operator,   cli: antigravity, model: Gemini 3.1 Pro (High), role: roles/operator.md }
-  - { name: codex-useradvocate,     cli: codex,  model: gpt-5.6-sol,    role: roles/user-advocate.md }
-  - { name: grok-realist,           cli: grok,   model: grok-4.6,       role: roles/realist.md }
+  - { name: claude-architect,       cli: claude, model: claude-fable-5-1, role: roles/architect.md }
+  - { name: codex-pragmatist,       cli: codex,  model: gpt-6-astra,      role: roles/pragmatist.md }
+  - { name: grok-skeptic,           cli: grok,   model: grok-4.6,         role: roles/skeptic.md }
+  - { name: claude-firstprinciples, cli: claude, model: claude-fable-5-1, role: roles/first-principles.md }
+  - { name: codex-operator,         cli: codex,  model: gpt-6-astra,      role: roles/operator.md }
+  - { name: claude-useradvocate,    cli: claude, model: claude-fable-5-1, role: roles/user-advocate.md }
+  - { name: grok-realist,           cli: grok,   model: grok-4.6,         role: roles/realist.md }
 
 # ---- EXECUTE: the build-off (SAME role, one per distinct model) --------------
 # Identical builder role; the diversity IS the model. Judge fuses the best of
@@ -50,8 +54,6 @@ advise_agents:
 # (same role + same model = redundant). grok PLANS here like the others — it
 # never executes; the autonomous executor stays codex-only (see executor:).
 execute_agents:
-  - { name: fable-builder,  cli: claude, model: claude-fable-5,  role: roles/builder.md }
-  - { name: opus-builder,   cli: claude, model: claude-opus-4-8, role: roles/builder.md }
-  - { name: codex-builder,  cli: codex,  model: gpt-5.6-sol,     role: roles/builder.md }
-  - { name: antigravity-builder, cli: antigravity, model: Gemini 3.1 Pro (High), role: roles/builder.md }
-  - { name: grok-builder,   cli: grok,   model: grok-4.6,        role: roles/builder.md }
+  - { name: fable-builder,  cli: claude, model: claude-fable-5-1, role: roles/builder.md }
+  - { name: codex-builder,  cli: codex,  model: gpt-6-astra,      role: roles/builder.md }
+  - { name: grok-builder,   cli: grok,   model: grok-4.6,         role: roles/builder.md }

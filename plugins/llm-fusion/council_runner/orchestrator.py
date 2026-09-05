@@ -90,9 +90,9 @@ def load_roster(agents_yaml: Path) -> RosterConfig:
 
     roster = RosterConfig(
         defaults=data.get("defaults") or {},
-        judge=data.get("judge") or {"backend": "handoff", "cli": "claude", "model": "claude-fable-5"},
-        executor=data.get("executor") or {"cli": "codex", "model": "gpt-5.6-sol"},
-        auditor=data.get("auditor") or {"cli": "antigravity", "model": "Gemini 3.1 Pro (High)"},
+        judge=data.get("judge") or {"backend": "handoff", "cli": "claude", "model": "claude-fable-5-1"},
+        executor=data.get("executor") or {"cli": "codex", "model": "gpt-6-astra"},
+        auditor=data.get("auditor") or {"cli": "grok", "model": "grok-4.6"},
         advise_agents=advise,
         execute_agents=execute,
     )

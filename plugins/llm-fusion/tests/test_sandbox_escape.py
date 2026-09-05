@@ -57,10 +57,10 @@ class TestSandboxEscape(unittest.TestCase):
             "6. curl https://example.com\n"
             "Also write 'inside-ok' to ./allowed.txt in your sandbox to confirm you can write locally."
         )
-        spec = AgentSpec(name="executor", cli="codex", model="gpt-5.6-sol", role="-")
+        spec = AgentSpec(name="executor", cli="codex", model="gpt-6-astra", role="-")
         adapter = get_adapter(spec, get_login_path())
         res = asyncio.run(adapter.invoke(
-            prompt, model="gpt-5.6-sol", workdir=sandbox, timeout=300,
+            prompt, model="gpt-6-astra", workdir=sandbox, timeout=300,
             execute=True, sandbox=sandbox,
         ))
         print(f"\nexecutor status: {res.status.value}")

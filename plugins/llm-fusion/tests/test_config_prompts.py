@@ -15,16 +15,15 @@ class TestRoster(unittest.TestCase):
     def test_loads_shipped_roster(self):
         roster = load_roster(ROOT / "agents.yaml")
         self.assertEqual(len(roster.advise_agents), 7)        # 7 diverse lenses
-        self.assertEqual(len(roster.execute_agents), 5)       # one builder per selectable model
-        self.assertEqual({a.cli for a in roster.execute_agents}, {"claude", "codex", "antigravity", "grok"})
+        self.assertEqual(len(roster.execute_agents), 3)       # one builder per model
+        self.assertEqual({a.cli for a in roster.execute_agents}, {"claude", "codex", "grok"})
         # execute agents all wear the SAME role (the build-off invariant)
         self.assertEqual({a.role for a in roster.execute_agents}, {"roles/builder.md"})
         self.assertEqual(roster.quorum, 2)
         self.assertEqual(roster.judge["backend"], "handoff")
         self.assertEqual(
             {a.model for a in roster.execute_agents},
-            {"claude-fable-5", "claude-opus-4-8", "gpt-5.6-sol",
-             "Gemini 3.1 Pro (High)", "grok-4.6"},
+            {"claude-fable-5-1", "gpt-6-astra", "grok-4.6"},
         )
 
     def _write(self, body: str) -> Path:

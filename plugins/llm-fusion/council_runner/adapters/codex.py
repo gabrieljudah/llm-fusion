@@ -2,7 +2,9 @@
 claude/antigravity do not). Every call carries --ignore-user-config (R5 guard): on
 codex's ~/.codex/config.toml commonly enables memories/use_memories + a supermemory
 MCP, which would carry a prior council answer forward. --ignore-user-config also
-drops the configured model, so -m is always passed explicitly. exec has no
+drops the configured model AND reasoning effort, so -m and
+-c model_reasoning_effort are always passed explicitly (xhigh: council seats run
+at a high tier; "ultra" is deliberately avoided because it auto-delegates). exec has no
 --ask-for-approval flag (0.139.0); sandbox policy governs acting.
 
 Executor writable roots are PINNED (codex workspace-write otherwise also writes
@@ -16,6 +18,9 @@ from .base import Adapter
 from ..core import AgentResult, Status
 
 
+REASONING_EFFORT = "xhigh"
+
+
 class CodexAdapter(Adapter):
     cli_name = "codex"
 
@@ -26,6 +31,7 @@ class CodexAdapter(Adapter):
             "--ignore-user-config",   # R5: non-negotiable (memory-off)
             "--skip-git-repo-check",
             "-o", str(out_file),
+            "-c", f'model_reasoning_effort="{REASONING_EFFORT}"',
         ]
         # non-regressable guard
         if "--ignore-user-config" not in argv:

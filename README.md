@@ -2,19 +2,18 @@
 
 > *Many models in. One fused answer out.*
 
-A **sealed multi-model LLM council** for Claude Code. One prompt → **Claude + Codex (GPT) + Antigravity (Gemini) + Grok (xAI) answer independently** (no peeking at each other) → anonymized → a judge fuses the best. Two commands:
+A **sealed multi-model LLM council** for Claude Code. One prompt → **Claude Fable 5.1 + Codex GPT-6 Astra + Grok 4.6 answer independently** (no peeking at each other) → anonymized → a judge fuses the best. Two commands:
 
-- **`/fusion-council "<question>"`** — choose Claude Fable 5, Claude Opus 4.8, Codex GPT5.6 sol, Gemini 3.1, and/or Grok 4.6; 7 expert lenses pressure-test the decision → one judged memo.
-- **`/fusion-build "<goal>"`** — choose at least 3 models for a sealed build-off; the judge fuses the best plan, then it gets built and audited.
+- **`/fusion-council "<question>"`** — Fable 5.1, GPT-6 Astra, and Grok 4.6 wear 7 expert lenses to pressure-test the decision → one judged memo.
+- **`/fusion-build "<goal>"`** — all three models plan the same job in a sealed build-off; the judge fuses the best plan, then it gets built and audited.
 
 This repo is both the **plugin** and its **marketplace** (the catalog Claude Code installs from).
 
 ## Install (members)
 
-**Prerequisites — you need all four CLIs installed and logged in, plus Python 3.11+:**
+**Prerequisites — you need all three CLIs installed and logged in, plus Python 3.11+:**
 - [`claude`](https://docs.claude.com/en/docs/claude-code) (Claude subscription)
-- `codex` (ChatGPT/Codex subscription)
-- `agy` (Google Antigravity CLI / Gemini subscription)
+- `codex` (ChatGPT/Codex subscription; version 0.153 or newer for GPT-6 Astra)
 - `grok` (xAI Grok CLI access)
 
 Then, in Claude Code:
@@ -31,7 +30,7 @@ cd plugins/llm-fusion
 python3 -m council_runner --doctor
 ```
 
-That's it — `/fusion-council` and `/fusion-build` are now available. Each asks which models to include; choose at least 3 across 2 providers, or use all five. Run folders are written to `~/.llm-council/council-runs/` (never inside the plugin).
+That's it — `/fusion-council` and `/fusion-build` are now available. Each runs the full three-model council (Fable 5.1, GPT-6 Astra, Grok 4.6). Run folders are written to `~/.llm-council/council-runs/` (never inside the plugin).
 
 ## Update
 

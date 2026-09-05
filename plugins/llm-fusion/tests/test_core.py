@@ -20,7 +20,7 @@ class TestMiniYaml(unittest.TestCase):
         self.assertEqual(data["judge"]["backend"], "handoff")
         self.assertEqual(data["executor"]["cli"], "codex")
         self.assertEqual(len(data["advise_agents"]), 7)
-        self.assertEqual(len(data["execute_agents"]), 5)
+        self.assertEqual(len(data["execute_agents"]), 3)
         names = {a["name"] for a in data["advise_agents"]}
         self.assertIn("claude-architect", names)
         self.assertIn("grok-realist", names)  # fork: 4th provider (xAI)

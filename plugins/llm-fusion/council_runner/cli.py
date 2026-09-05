@@ -174,13 +174,13 @@ def main(argv: list[str] | None = None) -> int:
 
     backend = args.judge or roster.judge.get("backend", "handoff")
     if backend == "auto" and not roster.judge.get("cli"):
-        print("error: --judge auto requires selecting Fable 5 or Opus 4.8", file=sys.stderr)
+        print("error: --judge auto requires selecting Fable 5.1 (the Claude judge seat)", file=sys.stderr)
         return 2
     if backend == "auto" and args.mode == "execute" and not roster.executor.get("cli"):
-        print("error: auto execute requires selecting GPT5.6 sol", file=sys.stderr)
+        print("error: auto execute requires selecting GPT-6 Astra (the codex executor seat)", file=sys.stderr)
         return 2
     if backend == "auto" and args.mode == "execute" and not roster.auditor.get("cli"):
-        print("error: auto execute requires selecting Gemini 3.1 for the independent audit", file=sys.stderr)
+        print("error: auto execute requires selecting Grok 4.6 for the independent audit", file=sys.stderr)
         return 2
     workspace = Path(args.workspace).expanduser().resolve() if args.workspace else None
     runs_dir.mkdir(parents=True, exist_ok=True)
